@@ -4,17 +4,22 @@ import {
   Users2, 
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { mockFixtureDetails } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import InvitedUsersTable from "@/components/Users/InvitedUsersTable"
+import { useFixtureQuery } from "@/lib/queries/fixtureQueries"
 
 
 const FixtureDetails = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  
-  if (!mockFixtureDetails) {
+   const { 
+       data: fixtureDetails, 
+       isLoading, 
+       error,
+       isFetching 
+     } = useFixtureQuery(id || '')
+  if (!fixtureDetails) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -30,6 +35,13 @@ const FixtureDetails = () => {
     )
   }
 
+  const {Completed, Events, League, Lineups, MatchState, Participants, Scores, Statistics, away_team_external_id, chatroom_user, start_time, ID} = fixtureDetails.data?.fixture
+  const homeTeam = Participants.find(
+    (participant) => participant.Home
+  );
+  const awayTeam = Participants.find(
+    (participant) => !participant.Home
+  );
   return (
     <div className="min-h-screen bg-gray-100 p-8 flex flex-col gap-y-8 w-full ">
 
@@ -51,35 +63,35 @@ const FixtureDetails = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users2 className="h-5 w-5" />
-                  {mockFixtureDetails.fixtureId}
+                  {ID}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-y-8">
                   <div>
                     <Label htmlFor="name">Home Team</Label>
-                    <p className="mt-1 text-gray-900">{mockFixtureDetails.homeTeamName}</p>
+                    <p className="mt-1 text-gray-900">{homeTeam.Name}</p>
                   </div>
                   <div>
                     <Label htmlFor="username">Away Team</Label>
-                    <p className="mt-1 text-gray-900">{mockFixtureDetails.awayTeamName}</p>
+                    <p className="mt-1 text-gray-900">{awayTeam.Name}</p>
                   </div>
                   
-                  <div>
+                  {/* <div>
                     <Label htmlFor="email">Scores</Label>
                     <p className="mt-1 text-gray-900">{mockFixtureDetails.homeScore} vs {mockFixtureDetails.awayScore}</p>
-                  </div>
+                  </div> */}
                   <div>
                     <Label htmlFor="coinBalance">League</Label>
-                    <p className="mt-1 text-gray-900">{mockFixtureDetails.leagueName}</p>
+                    <p className="mt-1 text-gray-900">{League.Name}</p>
                   </div>
                   <div>
                     <Label>Match Start Time</Label>
-                    <p className="mt-1 font-mono text-gray-900">{mockFixtureDetails.matchStartTime.toLocaleDateString()}</p>
+                    <p className="mt-1 font-mono text-gray-900">{start_time}</p>
                   </div>
                   <div>
                     <Label>Match State</Label>
-                    <p className="mt-1 font-mono text-gray-900">{mockFixtureDetails.matchState}</p>
+                    <p className="mt-1 font-mono text-gray-900">{MatchState}</p>
                   </div>
               
                 </div>

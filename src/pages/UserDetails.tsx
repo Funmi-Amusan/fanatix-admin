@@ -28,6 +28,8 @@ import { useUserQuery } from "@/lib/queries/userQueries"
 const UserDetails = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+
+  //i can use team?.color to design the page of the user details
  
   const { 
      data: userDetails, 
@@ -63,6 +65,8 @@ const UserDetails = () => {
 
   const showEditModal = () => {
   }
+
+  console.log('team', inviteDeactivated)
   return (
     <div className="min-h-screen bg-gray-100 p-8 w-full ">
 
@@ -162,8 +166,12 @@ const UserDetails = () => {
                   <p className="text-sm text-gray-900">{formatDate(new Date(updatedAt))}</p>
                 </div>
                 <div>
-                  <Label>Team ID</Label>
-                  <p className="text-sm font-mono text-gray-900">{teamId}</p>
+                  <Label>Team </Label>
+                  <p className="text-sm font-mono text-gray-900">{teams?.name}</p>
+                </div>
+                <div>
+                  <Label>Invite Code Deactivated </Label>
+                  <p className="text-sm font-mono text-gray-900">{inviteDeactivated ? 'True': 'False'}</p>
                 </div>
                 </div>
               </CardContent>

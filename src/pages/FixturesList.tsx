@@ -3,14 +3,12 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type SortingState,
   type ColumnFiltersState,
 } from "@tanstack/react-table"
 import { useState } from "react"
-
 import {
   Table,
   TableBody,
@@ -21,57 +19,105 @@ import {
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { mockFixtures } from "@/lib/data"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { useQueryClient } from '@tanstack/react-query'
+import type { LoggedInUser } from "@/api/types/auth"
 import type { Fixture } from "@/store/schemas/fixture.schema"
 import { columns } from "@/components/Fixtures/fixturesListTableColumns"
+import { useFixturesQuery } from "@/lib/queries/fixtureQueries"
 
-const FixturesList = ({
+export default function FixturesList({
   columns: propColumns = columns,
-  data = mockFixtures,
 }: {
   columns?: ColumnDef<Fixture, unknown>[]
-  data?: Fixture[]
-}) => {
+}) {
+  const queryClient = useQueryClient()
+  const user: LoggedInUser | undefined = queryClient.getQueryData(['user'])
+  const navigate = useNavigate()
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+
+  const { 
+    data: fixturesResponse, 
+    isLoading, 
+    error,
+    isFetching 
+  } = useFixturesQuery({
+    page: currentPage,
+    limit: pageSize,
+    search: globalFilter || undefined,
+  })
+  const fixtures = fixturesResponse?.data?.fixtures || []
+  const totalFixtures = fixturesResponse?.total || 0
+  const totalPages = Math.ceil(totalFixtures / pageSize)
+
+  console.log("fixturesResponse", fixturesResponse)
 
   const table = useReactTable({
-    data,
+    data: fixtures,
     columns: propColumns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: true, 
+    manualFiltering: true, 
+    pageCount: totalPages,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: (value) => {
+      setGlobalFilter(value)
+      setCurrentPage(1) 
+    },
     state: {
       sorting,
       columnFilters,
       globalFilter,
-    },
-    initialState: {
       pagination: {
-        pageSize: 10,
+        pageIndex: currentPage - 1,
+        pageSize,
       },
     },
   })
 
-  const navigate = useNavigate()
-
   const handleRowClick = (fixture: Fixture) => {
-    navigate(`/fixtures/${fixture.fixtureId}`) 
+    navigate(`/fixtures/${fixture.ID}`)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage)
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setCurrentPage(1) 
+  }
+
+  const startIndex = (currentPage - 1) * pageSize + 1
+  const endIndex = Math.min(currentPage * pageSize, totalFixtures)
+
+  if (error) {
+    return (
+      <div className="w-full p-8 bg-gray-100">
+        <Alert variant="destructive">
+          <AlertDescription>
+            Failed to load users: {error.message}
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
   }
 
   return (
     <div className="w-full p-8 bg-gray-100">
       <div className="">
         <div className="flex flex-col w-full py-4 gap-4">
-          <h2 className="font-bold text-xl">Hello Evano 👋,</h2>
+          <h2 className="font-bold text-xl">Hello {user?.name} 👋,</h2>
         </div>
         
         <div className="bg-white p-6 rounded-2xl">
@@ -223,5 +269,3 @@ const FixturesList = ({
     </div>
   )
 }
-
-export default FixturesList

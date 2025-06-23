@@ -2,6 +2,7 @@ import { getAuthTokens } from '@/lib/storage';
 import { httpClient } from './httpClient';
 import type { LoginRequest, LoginResponse } from './types/auth';
 import type { FetchUsersParams, User, UserResponse, UsersResponse } from './types/users';
+import type { FetchFixturesParams, FixtureResponse } from './types/fixtures';
 
 export const authEndpoints = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
@@ -54,3 +55,22 @@ export const userEndpoints = {
     // }
   };
   
+
+  export const fixtureEndpoints = {
+    fetchFixtures: async (params: FetchFixturesParams = {}): Promise<FixtureResponse> => {
+      const { token } = getAuthTokens();
+      const queryString = new URLSearchParams({
+        page: (params.page || 1).toString(),
+        limit: (params.limit || 10).toString(),
+        ...(params.search && { search: params.search }),
+      }).toString();
+      
+      return httpClient.get<FixtureResponse>(`/admin/fixture?${queryString}`, token);
+    },
+  
+   
+    fetchFixtureById: async (fixtureId: string): Promise<FixtureResponse> => {
+      const { token } = getAuthTokens();
+      return httpClient.get<FixtureResponse>(`/admin/fixture/${fixtureId}`, token);
+    }
+  };
