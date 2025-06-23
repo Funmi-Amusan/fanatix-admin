@@ -1,67 +1,17 @@
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useNavigate } from 'react-router-dom';
-
-const loginApi = async ({ email, password }: {email:string; password: string}) => {
-  try {
-    const response = await fetch("https://fanatix.usetend.com/api/v1/admin/authentication/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Login failed');
-    }
-
-    const data = await response.json();
-    return {
-      user: data.data.admin,
-      token: data.data.token,
-      refreshToken: data.refreshToken,
-      message: data.message
-    };
-  } catch (error) {
-    throw new Error(`Login error: ${error.message}`);
-  }
-};
+import { useLoginMutation } from '@/hooks/useAuthMutations';
 
 
 const Login = () => {
-
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const queryClient = useQueryClient();
 
-  const loginMutation = useMutation({
-    mutationFn: loginApi,
-    onSuccess: (data) => {
-      queryClient.setQueryData(['user'], data.user);
-      queryClient.setQueryData(['auth'], {
-        token: data.token,
-        refreshToken: data.refreshToken,
-        isAuthenticated: true
-      });
-      
-      sessionStorage.setItem('token', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      
-      navigate('/users');
-    },
-    onError: (error) => {
-      console.error('Login failed:', error.message);
-    }
-  });
+  const loginMutation = useLoginMutation();
 
   const handleSubmit = (e: React.FormEvent<HTMLButtonElement | HTMLInputElement>) => {
     e.preventDefault();
@@ -79,7 +29,6 @@ const Login = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-6">
-                {/* Error Alert */}
                 {loginMutation.isError && (
                   <Alert variant="destructive">
                     <AlertDescription>
@@ -88,7 +37,6 @@ const Login = () => {
                   </Alert>
                 )}
 
-                {/* Success Alert */}
                 {loginMutation.isSuccess && (
                   <Alert className="border-green-200 bg-green-50 text-green-800">
                     <AlertDescription>

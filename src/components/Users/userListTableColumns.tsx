@@ -1,49 +1,58 @@
-import type { UserTable } from "@/store/schemas/user.schema";
+import type { User } from "@/api/types/users";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Coins } from "lucide-react";
 
-export const columns: ColumnDef<UserTable>[] = [
+export const columns: ColumnDef<User>[] = [
     {
       accessorKey: "username",
       header: "Username",
       cell: ({ row }) => {
-        return <div className="font-semibold ">{row.getValue("username")}</div>
+        return (
+          <span>{row.original.username}</span> 
+        );
       },
     },
     {
       accessorKey: "email",
       header: "Email",
       cell: ({ row }) => {
-        return <div className="text-gray-600">{row.getValue("email")}</div>
+        return (
+          <span>{row.original.email}</span> 
+        );
       },
     },
     {
-      accessorKey: "coin",
+      accessorKey: "inviteCode",
+      header: "Invite Code",
+      cell: ({ row }) => {
+        return (
+          <span>{row.original.inviteCode}</span> 
+        );
+      },
+    },
+    {
+      accessorKey: "wallet.balance", 
       header: "Coins",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("coin"));
+        const amount = parseFloat(row.original.wallet.balance);
      
         return (
-          <div className="font-bold text-sm flex gap-1 text-center">
-            {amount}
-            <Coins className="text-yellow-600" />
+          <div className="flex items-center gap-2">
+            <Coins className="h-4 w-4 text-yellow-500" />
+            <span>{amount}</span>
           </div>
         );
       },
     },
     {
       accessorKey: "emailVerified",
-      header: "Verified",
+      header: "Email Verified",
       cell: ({ row }) => {
-        const verified = row.getValue("emailVerified");
+        const verified = row.original.emailVerified; 
         return (
-          <div className={`px-3 py-1 rounded-full text-sm font-semibold text-center w-fit ${
-            verified 
-              ? "bg-green-100 text-green-800" 
-              : "bg-red-100 text-red-800"
-          }`}>
+          <span>
             {verified ? "Verified" : "Unverified"}
-          </div>
+          </span>
         );
       },
     },
@@ -51,9 +60,8 @@ export const columns: ColumnDef<UserTable>[] = [
       accessorKey: "createdAt",
       header: "Created Date",
       cell: ({ row }) => {
-        const date = new Date(row.getValue("createdAt"));
-        return <div className="text-gray-500 text-sm">{date.toLocaleDateString()}</div>;
+        const date = new Date(row.original.createdAt);
+        return <span>{date.toLocaleDateString()}</span>;
       },
     },
   ];
-  
