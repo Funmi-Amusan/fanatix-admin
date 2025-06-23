@@ -24,8 +24,8 @@ import { Button } from "@/components/ui/button"
 import { mockFixtures } from "@/lib/data"
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { columns } from "./fixturesListTableColumns"
 import type { Fixture } from "@/store/schemas/fixture.schema"
+import { columns } from "@/components/Fixtures/fixturesListTableColumns"
 
 const FixturesList = ({
   columns: propColumns = columns,

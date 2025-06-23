@@ -1,16 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { 
   ArrowLeft, 
-  Edit, 
   Users2, 
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { mockFixtureDetails } from "@/lib/data"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Label } from "../ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import InvitedUsersTable from "../Users/InvitedUsersTable"
-import CoinTransactionTable from "../Users/CoinTransactionTable"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import InvitedUsersTable from "@/components/Users/InvitedUsersTable"
 
 
 const FixtureDetails = () => {

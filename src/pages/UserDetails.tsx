@@ -18,12 +18,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { mockUsers } from "@/lib/data"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Label } from "../ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import CoinTransactionTable from "./CoinTransactionTable"
-import InvitedUsersTable from "./InvitedUsersTable"
 import { formatDate } from "@/lib/helpers"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import InvitedUsersTable from "@/components/Users/InvitedUsersTable"
+import CoinTransactionTable from "@/components/Users/CoinTransactionTable"
 
 const UserDetails = () => {
   const { id } = useParams<{ id: string }>()

@@ -1,16 +1,20 @@
 import './globals.css';
 import { Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Home from './components/Home';
 import Login from './pages/Login';
 import NotFound from './components/404';
-import UsersList from './components/Users/UsersList';
-import UserDetails from './components/Users/UserDetails';
-import FixturesList from './components/Fixtures/FixturesList';
-import FixtureDetails from './components/Fixtures/FixtureDetails';
 import SidebarLayout from './components/layout/SidebarLayout';
+import UsersList from './pages/UsersList';
+import UserDetails from './pages/UserDetails';
+import FixturesList from './pages/FixturesList';
+import FixtureDetails from './pages/FixtureDetails';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <Routes>
       <Route element={<SidebarLayout />}>
         <Route path="/" element={<Home />} />
@@ -23,6 +27,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
+  </QueryClientProvider>
   );
 }
 

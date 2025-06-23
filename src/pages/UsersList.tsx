@@ -23,9 +23,10 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import type { UserTable } from "@/store/schemas/user.schema"
 import { mockUsers } from "@/lib/data"
-import { columns } from "./userListTableColumns"
 import { ArrowUp, Users, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { columns } from "@/components/Users/userListTableColumns"
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function UsersList({
   columns: propColumns = columns,
@@ -34,6 +35,9 @@ export default function UsersList({
   columns?: ColumnDef<UserTable, unknown>[]
   data?: UserTable[]
 }) {
+  const queryClient = useQueryClient();
+  const user = queryClient.getQueryData(['user']);
+
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState("")
@@ -65,12 +69,12 @@ export default function UsersList({
   const handleRowClick = (user: UserTable) => {
     navigate(`/users/${user.id}`) 
   }
-
+console.log("user", user)
   return (
     <div className="w-full p-8 bg-gray-100">
       <div className="">
         <div className="flex flex-col w-full py-4 gap-4">
-          <h2 className="font-bold text-xl">Hello Evano 👋,</h2>
+          <h2 className="font-bold text-xl">Hello {user?.name} 👋,</h2>
           <div className="bg-white shadow-sm p-4 grid rounded-2xl grid-cols-3">
             <div className="flex gap-2 items-center">
               <div className="bg-emerald-200 text-emerald-600 rounded-full p-4">
