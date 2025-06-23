@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import InvitedUsersTable from "@/components/Users/InvitedUsersTable"
 import { useFixtureQuery } from "@/lib/queries/fixtureQueries"
+import type { Participant } from "@/api/types/fixtures"
 
 
 const FixtureDetails = () => {
@@ -15,11 +16,11 @@ const FixtureDetails = () => {
   const navigate = useNavigate()
    const { 
        data: fixtureDetails, 
-       isLoading, 
-       error,
-       isFetching 
+      //  isLoading, 
+      //  error,
+      //  isFetching 
      } = useFixtureQuery(id || '')
-  if (!fixtureDetails) {
+  if (!fixtureDetails?.data?.fixture) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -35,12 +36,12 @@ const FixtureDetails = () => {
     )
   }
 
-  const {Completed, Events, League, Lineups, MatchState, Participants, Scores, Statistics, away_team_external_id, chatroom_user, start_time, ID} = fixtureDetails.data?.fixture
+  const {League, MatchState, Participants, start_time, ID} = fixtureDetails.data.fixture
   const homeTeam = Participants.find(
-    (participant) => participant.Home
+    (participant:Participant) => participant.Home
   );
   const awayTeam = Participants.find(
-    (participant) => !participant.Home
+    (participant:Participant) => !participant.Home
   );
   return (
     <div className="min-h-screen bg-gray-100 p-8 flex flex-col gap-y-8 w-full ">
@@ -70,11 +71,11 @@ const FixtureDetails = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-y-8">
                   <div>
                     <Label htmlFor="name">Home Team</Label>
-                    <p className="mt-1 text-gray-900">{homeTeam.Name}</p>
+                    <p className="mt-1 text-gray-900">{homeTeam?.Name}</p>
                   </div>
                   <div>
                     <Label htmlFor="username">Away Team</Label>
-                    <p className="mt-1 text-gray-900">{awayTeam.Name}</p>
+                    <p className="mt-1 text-gray-900">{awayTeam?.Name}</p>
                   </div>
                   
                   {/* <div>
@@ -104,5 +105,4 @@ const FixtureDetails = () => {
     </div>
   )
 }
-
 export default FixtureDetails

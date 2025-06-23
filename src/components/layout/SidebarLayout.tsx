@@ -1,10 +1,12 @@
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "../sidebar";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
+import { useAuthInit } from "@/hooks/useAuthInit";
 
 
 
 const SidebarLayout = () => {
+  useAuthInit();
     return (
       <SidebarProvider>
         <AppSidebar />

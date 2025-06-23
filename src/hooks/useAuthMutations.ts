@@ -1,5 +1,5 @@
 import { authEndpoints } from '@/api/endpoints';
-import { setAuthTokens } from '@/lib/storage';
+import { setAuthTokens, setUserData } from '@/lib/storage';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,7 +11,6 @@ export const useLoginMutation = () => {
     mutationFn: authEndpoints.login,
     onSuccess: (data) => {
       queryClient.setQueryData(['user'], data.data.admin);
-      
       queryClient.setQueryData(['auth'], {
         token: data.data.token,
         refreshToken: data.refreshToken,
@@ -19,6 +18,7 @@ export const useLoginMutation = () => {
       });
       
       setAuthTokens(data.data.token, data.refreshToken);
+      setUserData(data.data.admin);
       
       navigate('/users');
     },

@@ -1,5 +1,5 @@
+import type { Fixture, Participant } from "@/api/types/fixtures";
 import { formatDate } from "@/lib/helpers";
-import type { Fixture } from "@/store/schemas/fixture.schema";
 import type { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Fixture>[] = [

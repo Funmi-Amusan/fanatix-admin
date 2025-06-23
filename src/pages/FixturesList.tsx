@@ -24,9 +24,9 @@ import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "
 import { useNavigate } from "react-router-dom"
 import { useQueryClient } from '@tanstack/react-query'
 import type { LoggedInUser } from "@/api/types/auth"
-import type { Fixture } from "@/store/schemas/fixture.schema"
 import { columns } from "@/components/Fixtures/fixturesListTableColumns"
 import { useFixturesQuery } from "@/lib/queries/fixtureQueries"
+import type { Fixture } from "@/api/types/fixtures"
 
 export default function FixturesList({
   columns: propColumns = columns,
@@ -41,23 +41,22 @@ export default function FixturesList({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  // const [pageSize, setPageSize] = useState(10)
+  const pageSize = 10
 
   const { 
     data: fixturesResponse, 
-    isLoading, 
+    // isLoading, 
     error,
-    isFetching 
+    // isFetching 
   } = useFixturesQuery({
     page: currentPage,
     limit: pageSize,
     search: globalFilter || undefined,
   })
   const fixtures = fixturesResponse?.data?.fixtures || []
-  const totalFixtures = fixturesResponse?.total || 0
+  const totalFixtures =  10
   const totalPages = Math.ceil(totalFixtures / pageSize)
-
-  console.log("fixturesResponse", fixturesResponse)
 
   const table = useReactTable({
     data: fixtures,
@@ -89,17 +88,17 @@ export default function FixturesList({
     navigate(`/fixtures/${fixture.ID}`)
   }
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-  }
+  // const handlePageChange = (newPage: number) => {
+  //   setCurrentPage(newPage)
+  // }
 
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize)
-    setCurrentPage(1) 
-  }
+  // const handlePageSizeChange = (newPageSize: number) => {
+  //   setPageSize(newPageSize)
+  //   setCurrentPage(1) 
+  // }
 
-  const startIndex = (currentPage - 1) * pageSize + 1
-  const endIndex = Math.min(currentPage * pageSize, totalFixtures)
+  // const startIndex = (currentPage - 1) * pageSize + 1
+  // const endIndex = Math.min(currentPage * pageSize, totalFixtures)
 
   if (error) {
     return (

@@ -23,18 +23,17 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowUp, Users, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { columns } from "@/components/Users/userListTableColumns"
-import { useQueryClient } from '@tanstack/react-query'
 import type { User } from "@/api/types/users"
 import { useUsersQuery } from "@/lib/queries/userQueries"
-import type { LoggedInUser } from "@/api/types/auth"
+import { useUser } from "@/hooks/useUser"
 
 export default function UsersList({
   columns: propColumns = columns,
 }: {
   columns?: ColumnDef<User, unknown>[]
 }) {
-  const queryClient = useQueryClient()
-  const user: LoggedInUser | undefined = queryClient.getQueryData(['user'])
+  const { data: user, isLoading: isAuthLoading } = useUser();
+
   const navigate = useNavigate()
 
   const [sorting, setSorting] = useState<SortingState>([])
@@ -53,6 +52,7 @@ export default function UsersList({
     limit: pageSize,
     search: globalFilter || undefined,
   })
+  
   const users = usersResponse?.data?.users || []
   const totalUsers = usersResponse?.total || 0
   const totalPages = Math.ceil(totalUsers / pageSize)
@@ -82,7 +82,8 @@ export default function UsersList({
       },
     },
   })
-
+  if (isAuthLoading) return <div>Loading...</div>;
+  if (!user) return <div>Please login</div>;
   const handleRowClick = (user: User) => {
     navigate(`/users/${user.id}`)
   }

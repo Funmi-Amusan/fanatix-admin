@@ -2,7 +2,7 @@ import { getAuthTokens } from '@/lib/storage';
 import { httpClient } from './httpClient';
 import type { LoginRequest, LoginResponse } from './types/auth';
 import type { FetchUsersParams, User, UserResponse, UsersResponse } from './types/users';
-import type { FetchFixturesParams, FixtureResponse } from './types/fixtures';
+import type { FetchFixturesParams, FixtureResponse, FixturesResponse } from './types/fixtures';
 
 export const authEndpoints = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
@@ -57,7 +57,7 @@ export const userEndpoints = {
   
 
   export const fixtureEndpoints = {
-    fetchFixtures: async (params: FetchFixturesParams = {}): Promise<FixtureResponse> => {
+    fetchFixtures: async (params: FetchFixturesParams = {}): Promise<FixturesResponse> => {
       const { token } = getAuthTokens();
       const queryString = new URLSearchParams({
         page: (params.page || 1).toString(),
@@ -65,7 +65,7 @@ export const userEndpoints = {
         ...(params.search && { search: params.search }),
       }).toString();
       
-      return httpClient.get<FixtureResponse>(`/admin/fixture?${queryString}`, token);
+      return httpClient.get<FixturesResponse>(`/admin/fixture?${queryString}`, token);
     },
   
    

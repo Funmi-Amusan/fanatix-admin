@@ -33,9 +33,9 @@ const UserDetails = () => {
  
   const { 
      data: userDetails, 
-     isLoading, 
-     error,
-     isFetching 
+    //  isLoading, 
+    //  error,
+    //  isFetching 
    } = useUserQuery(id || '')
 
   if (!userDetails?.data.fan) {
@@ -54,7 +54,7 @@ const UserDetails = () => {
     )
   }
 
-  const {name, email, emailVerified, teamId, fanSince, squadNumber, username, inviteCode, createdAt, updatedAt, inviteDeactivated, teams, wallet} = userDetails.data.fan
+  const {name, email, emailVerified, fanSince, squadNumber, username, inviteCode, createdAt, updatedAt, inviteDeactivated, teams, wallet} = userDetails.data.fan
 
   const getVerificationBadge = (verified: boolean, label: string) => (
     <div className={` flex items-center w-fit ${verified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"} `}>

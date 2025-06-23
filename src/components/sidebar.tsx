@@ -1,4 +1,4 @@
-import { Calendar, HandCoins, ScanBarcode, User, Users } from "lucide-react"
+import { Calendar, User, Users } from "lucide-react"
 
 import {
   Sidebar,
@@ -22,16 +22,6 @@ const items = [
     title: "Fixtures",
     url: "/fixtures",
     icon: Calendar,
-  },
-  {
-    title: "Invite Codes",
-    url: "/codes",
-    icon: ScanBarcode,
-  },
-  {
-    title: "Coins",
-    url: "/coins",
-    icon: HandCoins,
   },
   {
     title: "Profile",

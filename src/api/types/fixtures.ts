@@ -1,10 +1,15 @@
 export interface FixtureResponse {
   message: string;
   data: {
+    fixture: Fixture;
+  };
+}
+export interface FixturesResponse {
+  message: string;
+  data: {
     fixtures: Fixture[];
   };
 }
-
 export interface Fixture {
   ID: number;
   external_id: number;
@@ -13,12 +18,12 @@ export interface Fixture {
   home_team_external_id: number;
   away_team_external_id: number;
   MatchState: string;
-  Scores: Score[];
+  Scores: unknown[]; 
   Participants: Participant[];
   League: League;
-  Statistics: any[]; 
-  Events: any | null; 
-  Lineups: any | null;
+  Statistics: unknown[]; 
+  Events: unknown[]; 
+  Lineups: unknown[]; 
   chatroom_user: ChatroomUser;
 }
 

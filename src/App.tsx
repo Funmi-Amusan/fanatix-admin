@@ -13,6 +13,7 @@ import FixtureDetails from './pages/FixtureDetails';
 const queryClient = new QueryClient();
 
 function App() {
+
   return (
     <QueryClientProvider client={queryClient}>
     <Routes>
@@ -23,7 +24,6 @@ function App() {
         <Route path="/fixtures" element={<FixturesList />} />
         <Route path="/fixtures/:id" element={<FixtureDetails />} />
       </Route>
-
       <Route path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

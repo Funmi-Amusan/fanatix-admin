@@ -1,13 +1,13 @@
 import { fixtureEndpoints } from '@/api/endpoints';
-import type { FetchFixturesParams, FixtureResponse } from '@/api/types/fixtures';
+import type { FetchFixturesParams, FixtureResponse, FixturesResponse } from '@/api/types/fixtures';
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 
 export const useFixturesQuery = (
   params: FetchFixturesParams = {},
-  options?: Omit<UseQueryOptions<FixtureResponse>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<FixturesResponse>, 'queryKey' | 'queryFn'>
 ) => {
   return useQuery({
-    queryKey: ['users', params],
+    queryKey: ['fixtures', params],
     queryFn: () => fixtureEndpoints.fetchFixtures(params),
     staleTime: 5 * 60 * 1000, 
     gcTime: 10 * 60 * 1000, 
@@ -20,7 +20,7 @@ export const useFixtureQuery = (
   options?: Omit<UseQueryOptions<FixtureResponse>, 'queryKey' | 'queryFn'>
 ) => {
   return useQuery({
-    queryKey: ['user', fixtureId],
+    queryKey: ['fixture', fixtureId],
     queryFn: () => fixtureEndpoints.fetchFixtureById(fixtureId),
     enabled: !!fixtureId, 
     staleTime: 5 * 60 * 1000, 
