@@ -1,7 +1,7 @@
 import './globals.css';
 import { Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
-import Login from './components/Login';
+import Login from './pages/Login';
 import NotFound from './components/404';
 import UsersList from './components/Users/UsersList';
 import UserDetails from './components/Users/UserDetails';

@@ -7,12 +7,23 @@ import {
   XCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 import { mockUsers } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "../ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import CoinTransactionTable from "./CoinTransactionTable"
 import InvitedUsersTable from "./InvitedUsersTable"
+import { formatDate } from "@/lib/helpers"
 
 const UserDetails = () => {
   const { id } = useParams<{ id: string }>()
@@ -37,22 +48,16 @@ const UserDetails = () => {
     )
   }
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date)
-  }
-
   const getVerificationBadge = (verified: boolean, label: string) => (
-    <div className={verified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
+    <div className={` flex items-center w-fit ${verified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"} `}>
       {verified ? <CheckCircle className="mr-1 h-3 w-3" /> : <XCircle className="mr-1 h-3 w-3" />}
       {label} {verified ? "Verified" : "Unverified"}
     </div>
   )
+
+  const showEditModal = () => {
+    console.log('first')
+  }
   return (
     <div className="min-h-screen bg-gray-100 p-8 w-full ">
 
@@ -69,12 +74,29 @@ const UserDetails = () => {
            
           </div>
           
-          <div className="flex gap-2">
-          <Button>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit User
-              </Button>
-          </div>
+          <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline"><Edit />Edit</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="start">
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={()=> showEditModal()}>
+            Edit User Details
+            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            Verify User
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem> Deactivate Invite Code</DropdownMenuItem>
+        <DropdownMenuItem>Generate New Invite Code</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+        Delete User
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
         </div>
         <div className=" flex flex-col gap-8">
           <div className="">

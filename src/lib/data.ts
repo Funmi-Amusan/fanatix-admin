@@ -191,6 +191,25 @@ export const mockUsers: UserTable[] = [
       inviteCode: "SA27AB1C",
       inviteCodeUsed: "DE4FG7HI",
       coin: "19"
+    },
+    {
+      id: "user_011",
+      name: "Sophia Anderson",
+      email: "sophia.anderson@example.com",
+      password: "hashed_password_707",
+      emailVerified: true,
+      identityVerified: false,
+      teamId: "team_beta",
+      fanSince: new Date("2022-12-03"),
+      squadNumber: 27,
+      username: "sophieanderson27",
+      oauthProvider: "facebook",
+      refreshTokenVersion: 2,
+      createdAt: new Date("2022-12-03T12:15:00Z"),
+      updatedAt: new Date("2024-12-21T08:30:00Z"),
+      inviteCode: "SA27AB1C",
+      inviteCodeUsed: "DE4FG7HI",
+      coin: "19"
     }
   ];
 
@@ -293,7 +312,6 @@ export const mockUsers: UserTable[] = [
     }
   ];
  
-  
   export const mockUserDetails: User = {
     id: "user_001",
     name: "John Smith",
@@ -414,6 +432,17 @@ export const mockUsers: UserTable[] = [
       },
       {
         id: "txn_010",
+        userId: "user_001",
+        type: "spent",
+        amount: 80,
+        description: "Contest participation reward",
+        reference: "contest_photo_december",
+        status: "pending",
+        createdAt: new Date("2024-12-11T12:00:00Z"),
+        updatedAt: new Date("2024-12-11T12:00:00Z")
+      },
+      {
+        id: "txn_011",
         userId: "user_001",
         type: "spent",
         amount: 80,
@@ -554,6 +583,308 @@ export const mockUsers: UserTable[] = [
         status: "active",
         usedAt: new Date("2024-10-18T14:45:00Z"),
         createdAt: new Date("2024-10-18T14:45:00Z")
+      },
+      {
+        id: "invite_011",
+        inviteCode: "JS7XM2K9",
+        invitedBy: "user_001",
+        invitedByName: "John Smith",
+        usedBy: "user_245",
+        usedByName: "Kevin Brown",
+        usedByEmail: "kevin.brown@example.com",
+        rewardGiven: 100,
+        status: "active",
+        usedAt: new Date("2024-10-18T14:45:00Z"),
+        createdAt: new Date("2024-10-18T14:45:00Z")
       }
     ]
+  }
+
+  export const mockFixtures = [
+    // Arsenal vs Chelsea - Premier League Derby
+    {
+      matchId: "EPL_001_2025",
+      fixtureId: "FXT_EPL_001_2025",
+      homeTeamId: "ARS",
+      homeTeamName: "Arsenal",
+      homeTeamImageUrl: "https://logos.soccerdata.com/arsenal.png",
+      awayTeamId: "CHE",
+      awayTeamName: "Chelsea",
+      awayTeamImageUrl: "https://logos.soccerdata.com/chelsea.png",
+      matchStartTime: new Date("2025-06-21T17:30:00Z"),
+      matchState: "live",
+      homeScore: 2,
+      awayScore: 1,
+      leagueName: "Premier League",
+      leagueImageUrl: "https://logos.soccerdata.com/premier_league.png",
+      lastUpdated: new Date("2025-06-21T18:45:00Z"),
+      createdAt: new Date("2025-06-15T09:00:00Z")
+    },
+    // Manchester United vs Liverpool - Classic Rivalry
+    {
+      matchId: "EPL_002_2025",
+      fixtureId: "FXT_EPL_002_2025",
+      homeTeamId: "MAN_UTD",
+      homeTeamName: "Manchester United",
+      homeTeamImageUrl: "https://logos.soccerdata.com/man_utd.png",
+      awayTeamId: "LIV",
+      awayTeamName: "Liverpool",
+      awayTeamImageUrl: "https://logos.soccerdata.com/liverpool.png",
+      matchStartTime: new Date("2025-06-22T15:00:00Z"),
+      matchState: "not_started",
+      homeScore: 0,
+      awayScore: 0,
+      leagueName: "Premier League",
+      leagueImageUrl: "https://logos.soccerdata.com/premier_league.png",
+      lastUpdated: new Date("2025-06-20T10:30:00Z"),
+      createdAt: new Date("2025-06-15T09:00:00Z")
+    },
+    // Manchester City vs Tottenham
+    {
+      matchId: "EPL_003_2025",
+      fixtureId: "FXT_EPL_003_2025",
+      homeTeamId: "MAN_CITY",
+      homeTeamName: "Manchester City",
+      homeTeamImageUrl: "https://logos.soccerdata.com/man_city.png",
+      awayTeamId: "TOT",
+      awayTeamName: "Tottenham Hotspur",
+      awayTeamImageUrl: "https://logos.soccerdata.com/tottenham.png",
+      matchStartTime: new Date("2025-06-19T20:00:00Z"),
+      matchState: "finished",
+      homeScore: 4,
+      awayScore: 1,
+      leagueName: "Premier League",
+      leagueImageUrl: "https://logos.soccerdata.com/premier_league.png",
+      lastUpdated: new Date("2025-06-19T22:00:00Z"),
+      createdAt: new Date("2025-06-14T09:00:00Z")
+    },
+    // El Clasico - Real Madrid vs Barcelona
+    {
+      matchId: "LALIGA_001_2025",
+      fixtureId: "FXT_LALIGA_001_2025",
+      homeTeamId: "RMA",
+      homeTeamName: "Real Madrid",
+      homeTeamImageUrl: "https://logos.soccerdata.com/real_madrid.png",
+      awayTeamId: "FCB",
+      awayTeamName: "FC Barcelona",
+      awayTeamImageUrl: "https://logos.soccerdata.com/barcelona.png",
+      matchStartTime: new Date("2025-06-23T19:00:00Z"),
+      matchState: "not_started",
+      homeScore: 0,
+      awayScore: 0,
+      leagueName: "La Liga",
+      leagueImageUrl: "https://logos.soccerdata.com/laliga.png",
+      lastUpdated: new Date("2025-06-20T14:20:00Z"),
+      createdAt: new Date("2025-06-16T11:00:00Z")
+    },
+    // Barcelona vs Atletico Madrid
+    {
+      matchId: "LALIGA_002_2025",
+      fixtureId: "FXT_LALIGA_002_2025",
+      homeTeamId: "FCB",
+      homeTeamName: "FC Barcelona",
+      homeTeamImageUrl: "https://logos.soccerdata.com/barcelona.png",
+      awayTeamId: "ATM",
+      awayTeamName: "Atletico Madrid",
+      awayTeamImageUrl: "https://logos.soccerdata.com/atletico_madrid.png",
+      matchStartTime: new Date("2025-06-18T18:30:00Z"),
+      matchState: "finished",
+      homeScore: 3,
+      awayScore: 2,
+      leagueName: "La Liga",
+      leagueImageUrl: "https://logos.soccerdata.com/laliga.png",
+      lastUpdated: new Date("2025-06-18T20:30:00Z"),
+      createdAt: new Date("2025-06-13T10:00:00Z")
+    },
+    // PSG vs Olympique Marseille - Le Classique
+    {
+      matchId: "LIGUE1_001_2025",
+      fixtureId: "FXT_LIGUE1_001_2025",
+      homeTeamId: "PSG",
+      homeTeamName: "Paris Saint-Germain",
+      homeTeamImageUrl: "https://logos.soccerdata.com/psg.png",
+      awayTeamId: "OLY",
+      awayTeamName: "Olympique Marseille",
+      awayTeamImageUrl: "https://logos.soccerdata.com/marseille.png",
+      matchStartTime: new Date("2025-06-20T20:00:00Z"),
+      matchState: "finished",
+      homeScore: 2,
+      awayScore: 0,
+      leagueName: "Ligue 1",
+      leagueImageUrl: "https://logos.soccerdata.com/ligue1.png",
+      lastUpdated: new Date("2025-06-20T22:00:00Z"),
+      createdAt: new Date("2025-06-15T13:45:00Z")
+    },
+    // Champions League - Real Madrid vs Manchester City
+    {
+      matchId: "CL_001_2025",
+      fixtureId: "FXT_CL_001_2025",
+      homeTeamId: "RMA",
+      homeTeamName: "Real Madrid",
+      homeTeamImageUrl: "https://logos.soccerdata.com/real_madrid.png",
+      awayTeamId: "MAN_CITY",
+      awayTeamName: "Manchester City",
+      awayTeamImageUrl: "https://logos.soccerdata.com/man_city.png",
+      matchStartTime: new Date("2025-06-25T19:00:00Z"),
+      matchState: "not_started",
+      homeScore: 0,
+      awayScore: 0,
+      leagueName: "UEFA Champions League",
+      leagueImageUrl: "https://logos.soccerdata.com/champions_league.png",
+      lastUpdated: new Date("2025-06-20T11:00:00Z"),
+      createdAt: new Date("2025-06-18T14:20:00Z")
+    },
+    // Champions League - PSG vs Arsenal
+    {
+      matchId: "CL_002_2025",
+      fixtureId: "FXT_CL_002_2025",
+      homeTeamId: "PSG",
+      homeTeamName: "Paris Saint-Germain",
+      homeTeamImageUrl: "https://logos.soccerdata.com/psg.png",
+      awayTeamId: "ARS",
+      awayTeamName: "Arsenal",
+      awayTeamImageUrl: "https://logos.soccerdata.com/arsenal.png",
+      matchStartTime: new Date("2025-06-26T19:00:00Z"),
+      matchState: "not_started",
+      homeScore: 0,
+      awayScore: 0,
+      leagueName: "UEFA Champions League",
+      leagueImageUrl: "https://logos.soccerdata.com/champions_league.png",
+      lastUpdated: new Date("2025-06-20T12:15:00Z"),
+      createdAt: new Date("2025-06-18T15:30:00Z")
+    },
+    // Premier League - Liverpool vs Newcastle
+    {
+      matchId: "EPL_004_2025",
+      fixtureId: "FXT_EPL_004_2025",
+      homeTeamId: "LIV",
+      homeTeamName: "Liverpool",
+      homeTeamImageUrl: "https://logos.soccerdata.com/liverpool.png",
+      awayTeamId: "NEW",
+      awayTeamName: "Newcastle United",
+      awayTeamImageUrl: "https://logos.soccerdata.com/newcastle.png",
+      matchStartTime: new Date("2025-06-22T12:30:00Z"),
+      matchState: "not_started",
+      homeScore: 0,
+      awayScore: 0,
+      leagueName: "Premier League",
+      leagueImageUrl: "https://logos.soccerdata.com/premier_league.png",
+      lastUpdated: new Date("2025-06-20T09:45:00Z"),
+      createdAt: new Date("2025-06-16T08:30:00Z")
+    },
+    // Premier League - Chelsea vs Brighton
+    {
+      matchId: "EPL_005_2025",
+      fixtureId: "FXT_EPL_005_2025",
+      homeTeamId: "CHE",
+      homeTeamName: "Chelsea",
+      homeTeamImageUrl: "https://logos.soccerdata.com/chelsea.png",
+      awayTeamId: "BRI",
+      awayTeamName: "Brighton & Hove Albion",
+      awayTeamImageUrl: "https://logos.soccerdata.com/brighton.png",
+      matchStartTime: new Date("2025-06-17T16:00:00Z"),
+      matchState: "finished",
+      homeScore: 2,
+      awayScore: 1,
+      leagueName: "Premier League",
+      leagueImageUrl: "https://logos.soccerdata.com/premier_league.png",
+      lastUpdated: new Date("2025-06-17T18:00:00Z"),
+      createdAt: new Date("2025-06-12T10:15:00Z")
+    },
+    // La Liga - Real Madrid vs Valencia
+    {
+      matchId: "LALIGA_003_2025",
+      fixtureId: "FXT_LALIGA_003_2025",
+      homeTeamId: "RMA",
+      homeTeamName: "Real Madrid",
+      homeTeamImageUrl: "https://logos.soccerdata.com/real_madrid.png",
+      awayTeamId: "VAL",
+      awayTeamName: "Valencia",
+      awayTeamImageUrl: "https://logos.soccerdata.com/valencia.png",
+      matchStartTime: new Date("2025-06-21T16:30:00Z"),
+      matchState: "live",
+      homeScore: 1,
+      awayScore: 0,
+      leagueName: "La Liga",
+      leagueImageUrl: "https://logos.soccerdata.com/laliga.png",
+      lastUpdated: new Date("2025-06-21T17:15:00Z"),
+      createdAt: new Date("2025-06-15T11:20:00Z")
+    },
+    // Premier League - Manchester United vs West Ham
+    {
+      matchId: "EPL_006_2025",
+      fixtureId: "FXT_EPL_006_2025",
+      homeTeamId: "MAN_UTD",
+      homeTeamName: "Manchester United",
+      homeTeamImageUrl: "https://logos.soccerdata.com/man_utd.png",
+      awayTeamId: "WHU",
+      awayTeamName: "West Ham United",
+      awayTeamImageUrl: "https://logos.soccerdata.com/west_ham.png",
+      matchStartTime: new Date("2025-06-19T17:00:00Z"),
+      matchState: "finished",
+      homeScore: 3,
+      awayScore: 1,
+      leagueName: "Premier League",
+      leagueImageUrl: "https://logos.soccerdata.com/premier_league.png",
+      lastUpdated: new Date("2025-06-19T19:00:00Z"),
+      createdAt: new Date("2025-06-14T15:30:00Z")
+    },
+    // Ligue 1 - PSG vs Lyon
+    {
+      matchId: "LIGUE1_002_2025",
+      fixtureId: "FXT_LIGUE1_002_2025",
+      homeTeamId: "PSG",
+      homeTeamName: "Paris Saint-Germain",
+      homeTeamImageUrl: "https://logos.soccerdata.com/psg.png",
+      awayTeamId: "OL",
+      awayTeamName: "Olympique Lyonnais",
+      awayTeamImageUrl: "https://logos.soccerdata.com/lyon.png",
+      matchStartTime: new Date("2025-06-24T19:00:00Z"),
+      matchState: "not_started",
+      homeScore: 0,
+      awayScore: 0,
+      leagueName: "Ligue 1",
+      leagueImageUrl: "https://logos.soccerdata.com/ligue1.png",
+      lastUpdated: new Date("2025-06-20T13:15:00Z"),
+      createdAt: new Date("2025-06-18T16:45:00Z")
+    },
+    // Premier League - Arsenal vs Aston Villa
+    {
+      matchId: "EPL_007_2025",
+      fixtureId: "FXT_EPL_007_2025",
+      homeTeamId: "ARS",
+      homeTeamName: "Arsenal",
+      homeTeamImageUrl: "https://logos.soccerdata.com/arsenal.png",
+      awayTeamId: "AVL",
+      awayTeamName: "Aston Villa",
+      awayTeamImageUrl: "https://logos.soccerdata.com/aston_villa.png",
+      matchStartTime: new Date("2025-06-24T20:00:00Z"),
+      matchState: "not_started",
+      homeScore: 0,
+      awayScore: 0,
+      leagueName: "Premier League",
+      leagueImageUrl: "https://logos.soccerdata.com/premier_league.png",
+      lastUpdated: new Date("2025-06-20T08:00:00Z"),
+      createdAt: new Date("2025-06-17T12:00:00Z")
+    }
+  ]
+
+  export const mockFixtureDetails =   {
+    matchId: "EPL_001_2025",
+    fixtureId: "FXT_EPL_001_2025",
+    homeTeamId: "ARS",
+    homeTeamName: "Arsenal",
+    homeTeamImageUrl: "https://logos.soccerdata.com/arsenal.png",
+    awayTeamId: "CHE",
+    awayTeamName: "Chelsea",
+    awayTeamImageUrl: "https://logos.soccerdata.com/chelsea.png",
+    matchStartTime: new Date("2025-06-21T17:30:00Z"),
+    matchState: "live",
+    homeScore: 2,
+    awayScore: 1,
+    leagueName: "Premier League",
+    leagueImageUrl: "https://logos.soccerdata.com/premier_league.png",
+    lastUpdated: new Date("2025-06-21T18:45:00Z"),
+    createdAt: new Date("2025-06-15T09:00:00Z"),
+    chatList: mockUsers
   }
