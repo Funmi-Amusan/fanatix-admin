@@ -33,7 +33,7 @@ export const userEndpoints = {
    
     fetchUserById: async (userId: string): Promise<UserResponse> => {
       const { token } = getAuthTokens();
-      return httpClient.get<UserResponse>(`/admin/users/${userId}`, token);
+      return httpClient.get<UserResponse>(`/admin/user/${userId}`, token);
     },
   
 

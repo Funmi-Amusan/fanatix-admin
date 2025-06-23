@@ -21,6 +21,8 @@ export interface User {
   wallet: Wallet;
 }
 
+
+
 export interface UsersResponse {
     data: {
         users: User[]
@@ -32,7 +34,9 @@ export interface UsersResponse {
 }
 
 export interface UserResponse {
-    data: User;
+    data: {
+      fan: User
+    };
     message: string;
 }
 
