@@ -129,30 +129,40 @@ export default function FixturesList({ columns = defaultColumns }: FixturesListP
                 ))}
               </TableHeader>
               <TableBody>
-                {fixtures.length > 0 ? (
-                  table.getRowModel().rows.map(row => (
-                    <TableRow
-                      key={row.id}
-                      className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleRowClick(row.original)}
-                    >
-                      {row.getVisibleCells().map(cell => (
-                        <TableCell key={cell.id} className="py-4 px-6">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="text-center py-12 text-gray-500">
-                      <div className="text-4xl">⚽</div>
-                      <p className="text-lg font-medium">No fixtures found</p>
-                      <p className="text-sm">Try adjusting your filters</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
+  {isLoading ? (
+    <TableRow>
+      <TableCell colSpan={columns.length} className="py-12 text-center">
+        <div className="flex flex-col items-center gap-3 text-gray-500">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>Loading fixtures...</span>
+        </div>
+      </TableCell>
+    </TableRow>
+  ) : fixtures.length > 0 ? (
+    table.getRowModel().rows.map(row => (
+      <TableRow
+        key={row.id}
+        className="hover:bg-gray-50 cursor-pointer"
+        onClick={() => handleRowClick(row.original)}
+      >
+        {row.getVisibleCells().map(cell => (
+          <TableCell key={cell.id} className="py-4 px-6">
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        ))}
+      </TableRow>
+    ))
+  ) : (
+    <TableRow>
+      <TableCell colSpan={columns.length} className="text-center py-12 text-gray-500">
+        <div className="text-4xl">⚽</div>
+        <p className="text-lg font-medium">No fixtures found</p>
+        <p className="text-sm">Try adjusting your filters</p>
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
+
             </Table>
 
             <div ref={bottomRef} className="h-16 mt-6 flex justify-center items-center">

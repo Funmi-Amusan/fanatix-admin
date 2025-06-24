@@ -14,12 +14,22 @@ import FixtureChatRoomUsersTable from "@/components/Fixtures/FixtureChatRoomUser
 const FixtureDetails = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-   const { 
-       data: fixtureDetails, 
-      //  isLoading, 
-      //  error,
-      //  isFetching 
-     } = useFixtureQuery(id || '')
+  const { 
+    data: fixtureDetails, 
+    isLoading, 
+  } = useFixtureQuery(id || '')
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <div className="text-3xl animate-pulse mb-2">⏳</div>
+          <p className="text-lg font-medium">Loading fixture details...</p>
+        </div>
+      </div>
+    )
+  }  
+  
   if (!fixtureDetails?.data?.fixture) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
