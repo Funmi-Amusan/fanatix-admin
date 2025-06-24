@@ -23,9 +23,8 @@ export const useCreateUserMutation = () => {
     return useMutation({
       mutationFn: ({ userId, userData }: { userId: string; userData: updateUser }) => 
         userEndpoints.updateUser(userId, userData),
-      onSuccess: (data, variables) => {
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['users'] });
-        queryClient.invalidateQueries({ queryKey: ['user', variables.userId] });
       },
       onError: (error) => {
         console.error('Failed to update user:', error);

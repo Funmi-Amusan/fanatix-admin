@@ -10,8 +10,6 @@ import FixturesList from './pages/FixturesList';
 import FixtureDetails from './pages/FixtureDetails';
 import ChangePassword from './pages/ChangePassword';
 import Profile from './pages/Profile';
-import ProtectedRoute from './ProtectedRoutes';
-import RedirectRoot from './RedirectRoutes';
 
 const queryClient = new QueryClient();
 

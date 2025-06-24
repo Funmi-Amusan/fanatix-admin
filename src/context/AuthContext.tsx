@@ -2,10 +2,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getUserData, clearAuthData } from '@/lib/storage';
-import type { LoggedInUser } from '@/api/types/auth';
+import type { AdminUser } from '@/api/types/admins';
 
 const AuthContext = createContext<{
-  user: LoggedInUser|null;
+  user: AdminUser|null;
   logout: () => void;
   isLoading: boolean;
 }>({

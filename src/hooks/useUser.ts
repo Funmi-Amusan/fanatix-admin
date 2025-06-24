@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getUserData } from '@/lib/storage';
-import type { LoggedInUser } from '@/api/types/auth';
+import type { AdminUser } from '@/api/types/admins';
 
 export const useUser = () => {
   const queryClient = useQueryClient();
@@ -8,7 +8,7 @@ export const useUser = () => {
   return useQuery({
     queryKey: ['user'],
     queryFn: () => {
-      let user: LoggedInUser|undefined = queryClient.getQueryData(['user']);
+      let user: AdminUser|undefined = queryClient.getQueryData(['user']);
       
       if (!user) {
         user = getUserData();
