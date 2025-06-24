@@ -1,5 +1,7 @@
 import type { ChangePasswordRequest, LoginRequest } from "./types/auth";
 import type { updateUser } from "./types/users";
+import { toast } from 'sonner';
+
 
 const API_BASE_URL = 'https://fanatix.usetend.com/api/v1';
 
@@ -18,10 +20,13 @@ export const httpClient = {
         body: JSON.stringify(data),
       });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Request failed');
-    }
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData.message || 'Request failed';
+        toast.error(message);
+        throw new Error(message);
+      }
+      
 
     return response.json();
   },
@@ -42,8 +47,11 @@ export const httpClient = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Request failed');
+      const message = errorData.message || 'Request failed';
+      toast.error(message); 
+      throw new Error(message);
     }
+    
 
     return response.json();
   },
@@ -62,10 +70,13 @@ export const httpClient = {
         body: JSON.stringify(data),
       });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Request failed');
-    }
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData.message || 'Request failed';
+        toast.error(message);
+        throw new Error(message);
+      }
+      
 
     return response.json();
   },
@@ -107,8 +118,11 @@ export const httpClient = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Request failed');
+      const message = errorData.message || 'Request failed';
+      toast.error(message);
+      throw new Error(message);
     }
+    
 
     return response.json();
   },
