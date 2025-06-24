@@ -1,14 +1,10 @@
 import {
-  type ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
-  type SortingState,
-  type ColumnFiltersState,
-} from "@tanstack/react-table"
-import { useState } from "react"
+  type ColumnDef,
+} from '@tanstack/react-table'
 import {
   Table,
   TableBody,
@@ -16,254 +12,158 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Loader2, Filter as FilterIcon } from 'lucide-react'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import type { LoggedInUser } from "@/api/types/auth"
-import { columns } from "@/components/Fixtures/fixturesListTableColumns"
-import { useFixturesQuery } from "@/lib/queries/fixtureQueries"
-import type { Fixture } from "@/api/types/fixtures"
+import { columns as defaultColumns } from '@/components/Fixtures/fixturesListTableColumns'
+import { fixtureEndpoints } from '@/api/endpoints'
 
-export default function FixturesList({
-  columns: propColumns = columns,
-}: {
+interface FixturesListProps {
   columns?: ColumnDef<Fixture, unknown>[]
-}) {
-  const queryClient = useQueryClient()
-  const user: LoggedInUser | undefined = queryClient.getQueryData(['user'])
+}
+
+export default function FixturesList({ columns = defaultColumns }: FixturesListProps) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const user = queryClient.getQueryData(['user']) as any
 
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [globalFilter, setGlobalFilter] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  // const [pageSize, setPageSize] = useState(10)
-  const pageSize = 10
+  const bottomRef = useRef<HTMLDivElement | null>(null)
 
-  const { 
-    data: fixturesResponse, 
-    // isLoading, 
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
     error,
-    // isFetching 
-  } = useFixturesQuery({
-    page: currentPage,
-    limit: pageSize,
-    search: globalFilter || undefined,
+  } = useInfiniteQuery({
+    queryKey: ['fixtures'],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) =>
+      fixtureEndpoints.fetchFixtures({ page: pageParam, limit: 10 }),
+    getNextPageParam: (lastPage, pages) => {
+      const current = lastPage.meta?.currentPage ?? pages.length
+      const total = lastPage.meta?.totalPages ?? 1
+      return current < total ? current + 1 : undefined
+    },
   })
-  const fixtures = fixturesResponse?.data?.fixtures || []
-  const totalFixtures =  10
-  const totalPages = Math.ceil(totalFixtures / pageSize)
+  
+
+  const fixtures = useMemo(() => data?.pages.flatMap(p => p.data.fixtures ?? []) ?? [], [data])
 
   const table = useReactTable({
     data: fixtures,
-    columns: propColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    manualPagination: true, 
-    manualFiltering: true, 
-    pageCount: totalPages,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: (value) => {
-      setGlobalFilter(value)
-      setCurrentPage(1) 
-    },
-    state: {
-      sorting,
-      columnFilters,
-      globalFilter,
-      pagination: {
-        pageIndex: currentPage - 1,
-        pageSize,
-      },
-    },
   })
+  
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage()
+      }
+    })
+    const ref = bottomRef.current
+    if (ref) observer.observe(ref)
+    return () => ref && observer.unobserve(ref)
+  }, [bottomRef.current, hasNextPage, isFetchingNextPage])
 
   const handleRowClick = (fixture: Fixture) => {
     navigate(`/fixtures/${fixture.ID}`)
   }
 
-  // const handlePageChange = (newPage: number) => {
-  //   setCurrentPage(newPage)
-  // }
-
-  // const handlePageSizeChange = (newPageSize: number) => {
-  //   setPageSize(newPageSize)
-  //   setCurrentPage(1) 
-  // }
-
-  // const startIndex = (currentPage - 1) * pageSize + 1
-  // const endIndex = Math.min(currentPage * pageSize, totalFixtures)
-
-  if (error) {
-    return (
-      <div className="w-full p-8 bg-gray-100">
-        <Alert variant="destructive">
-          <AlertDescription>
-            Failed to load users: {error.message}
-          </AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
-
   return (
     <div className="w-full p-8 bg-gray-100">
-      <div className="">
-        <div className="flex flex-col w-full py-4 gap-4">
-          <h2 className="font-bold text-xl">Hello {user?.name} 👋,</h2>
-        </div>
-        
-        <div className="bg-white p-6 rounded-2xl">
-          {/* Table Header with Title and Search */}
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">All Fixtures</h1>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-              <Input
-                placeholder="Search fixtures..."
-                value={globalFilter ?? ""}
-                onChange={(event) => setGlobalFilter(String(event.target.value))}
-                className="pl-10 w-80"
-              />
-            </div>
-          </div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Hello {user?.name} 👋</h2>
+       
+      </div>
 
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="border-b border-gray-200 hover:bg-gray-100">
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead 
-                        key={header.id} 
-                        className="font-semibold text-gray-900 py-4 px-6 text-left"
+      <div className="bg-white p-6 rounded-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">All Fixtures</h1>
+          {isLoading && (
+            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+          )}
+        </div>
+
+        {error ? (
+          <div className="text-center text-red-600">⚠️ Failed to load fixtures.</div>
+        ) : (
+          <>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map(headerGroup => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map(header => (
+                      <TableHead
+                        key={header.id}
+                        onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                        className={`py-4 px-6 font-semibold text-left ${
+                          header.column.getCanSort() ? 'cursor-pointer hover:underline' : ''
+                        }`}
                       >
-                        {header.isPlaceholder ? null : (
-                          <div
-                            {...{
-                              className: header.column.getCanSort()
-                                ? 'cursor-pointer select-none flex items-center gap-1'
-                                : '',
-                              onClick: header.column.getToggleSortingHandler(),
-                            }}
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                            {{
-                              asc: ' 🔼',
-                              desc: ' 🔽',
-                            }[header.column.getIsSorted() as string] ?? null}
-                          </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{
+                            asc: ' 🔼',
+                            desc: ' 🔽',
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
                       </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, index) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className={`
-                      border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 cursor-pointer
-                      ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}
-                    `}
-                    onClick={() => handleRowClick(row.original)}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell 
-                        key={cell.id}
-                        className="py-4 px-6"
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell 
-                    colSpan={propColumns.length} 
-                    className="h-32 text-center text-gray-500 bg-gray-50"
-                  >
-                    <div className="flex flex-col items-center justify-center space-y-2">
+                ))}
+              </TableHeader>
+              <TableBody>
+                {fixtures.length > 0 ? (
+                  table.getRowModel().rows.map(row => (
+                    <TableRow
+                      key={row.id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleRowClick(row.original)}
+                    >
+                      {row.getVisibleCells().map(cell => (
+                        <TableCell key={cell.id} className="py-4 px-6">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="text-center py-12 text-gray-500">
                       <div className="text-4xl">⚽</div>
-                      <div className="text-lg font-medium">No fixtures found</div>
-                      <div className="text-sm">Try adjusting your search criteria</div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                      <p className="text-lg font-medium">No fixtures found</p>
+                      <p className="text-sm">Try adjusting your filters</p>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
 
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-between space-x-2 py-4">
-            <div className="text-sm text-gray-600">
-              Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{' '}
-              {Math.min(
-                (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-                table.getFilteredRowModel().rows.length
-              )}{' '}
-              of {table.getFilteredRowModel().rows.length} fixtures
+            <div ref={bottomRef} className="h-16 mt-6 flex justify-center items-center">
+              {isFetchingNextPage && (
+                <span className="flex items-center gap-2 text-sm text-gray-500">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading more fixtures...
+                </span>
+              )}
+              {!hasNextPage && fixtures.length > 0 && (
+                <span className="text-gray-400 text-sm">
+                  Showing all {fixtures.length} fixture{fixtures.length !== 1 && 's'}
+                </span>
+              )}
             </div>
-            
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronsLeft size={16} />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronLeft size={16} />
-              </Button>
-              
-              <span className="flex items-center gap-1 text-sm">
-                Page
-                <strong>
-                  {table.getState().pagination.pageIndex + 1} of{' '}
-                  {table.getPageCount()}
-                </strong>
-              </span>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronRight size={16} />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronsRight size={16} />
-              </Button>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   )

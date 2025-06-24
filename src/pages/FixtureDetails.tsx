@@ -6,9 +6,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import InvitedUsersTable from "@/components/Users/InvitedUsersTable"
 import { useFixtureQuery } from "@/lib/queries/fixtureQueries"
 import type { Participant } from "@/api/types/fixtures"
+import FixtureChatRoomUsersTable from "@/components/Fixtures/FixtureChatRoomUsersTable"
 
 
 const FixtureDetails = () => {
@@ -43,6 +43,8 @@ const FixtureDetails = () => {
   const awayTeam = Participants.find(
     (participant:Participant) => !participant.Home
   );
+
+  console.log("details", fixtureDetails.data.fixture)
   return (
     <div className="min-h-screen bg-gray-100 p-8 flex flex-col gap-y-8 w-full ">
 
@@ -101,7 +103,7 @@ const FixtureDetails = () => {
           </div>
         </div>
 
-        <InvitedUsersTable />
+       <FixtureChatRoomUsersTable fixtureId={ID} />
     </div>
   )
 }

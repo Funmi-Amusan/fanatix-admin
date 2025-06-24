@@ -1,3 +1,5 @@
+import type { User } from "./users";
+
 export interface FixtureResponse {
   message: string;
   data: {
@@ -10,6 +12,14 @@ export interface FixturesResponse {
     fixtures: Fixture[];
   };
 }
+
+export interface FixtureChatRoomUsersResponse {
+  message: string;
+  data: {
+    users: ChatRoomUser[];
+  };
+}
+
 export interface Fixture {
   ID: number;
   external_id: number;
@@ -24,7 +34,7 @@ export interface Fixture {
   Statistics: unknown[]; 
   Events: unknown[]; 
   Lineups: unknown[]; 
-  chatroom_user: ChatroomUser;
+  chatroom_user: ChatRoomUser;
 }
 
 export interface FetchFixturesParams {
@@ -59,9 +69,15 @@ export interface League {
   image_url: string;
 }
 
-export interface ChatroomUser {
-  id: number;
-  userID: string;
-  chatroomID: number;
-  createdAt: string;
-}
+export type ChatRoomUser = Pick<
+  User,
+  'id' | 'teamId' | 'fanSince' | 'squadNumber' | 'username'
+> & {
+  team: {
+    ID: string;
+    name: string;
+    imageURL: string;
+    externalID: string;
+    color: string;
+  };
+};

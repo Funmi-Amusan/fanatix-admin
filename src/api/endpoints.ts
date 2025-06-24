@@ -80,7 +80,16 @@ export const userEndpoints = {
     fetchFixtureById: async (fixtureId: string): Promise<FixtureResponse> => {
       const { token } = getAuthTokens();
       return httpClient.get<FixtureResponse>(`/admin/fixture/${fixtureId}`, token);
-    }
+    },
+
+    fetchFixtureChatRoomUsers: async (fixtureId: number, params: FetchFixturesParams = {}): Promise<FixturesResponse> => {
+      const { token } = getAuthTokens();
+      const queryString = new URLSearchParams({
+        page: (params.page || 1).toString(),
+        limit: (params.limit || 10).toString()
+      }).toString();
+      return httpClient.get<FixturesResponse>(`/admin/chat/${fixtureId}/user?${queryString}`, token);
+    },
   };
 
   export const teamEndpoints = {
