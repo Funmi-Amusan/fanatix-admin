@@ -9,6 +9,7 @@ import UsersList from './pages/UsersList';
 import UserDetails from './pages/UserDetails';
 import FixturesList from './pages/FixturesList';
 import FixtureDetails from './pages/FixtureDetails';
+import ChangePassword from './pages/ChangePassword';
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/users/:id" element={<UserDetails />} />
         <Route path="/fixtures" element={<FixturesList />} />
         <Route path="/fixtures/:id" element={<FixtureDetails />} />
+      <Route path="/change-password" element={<ChangePassword />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />

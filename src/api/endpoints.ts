@@ -1,6 +1,6 @@
 import { getAuthTokens } from '@/lib/storage';
 import { httpClient } from './httpClient';
-import type { LoginRequest, LoginResponse } from './types/auth';
+import type { ChangePasswordRequest, ChangePasswordResponse, LoginRequest, LoginResponse } from './types/auth';
 import type { FetchUsersParams, updateUser, User, UserResponse, UsersResponse } from './types/users';
 import type { FetchFixturesParams, FixtureResponse, FixturesResponse } from './types/fixtures';
 import type { FetchTeamsParams, TeamsResponse } from './types/teams';
@@ -10,6 +10,9 @@ import type { BuyPlanResponse, PlansResponse } from './types/wallet';
 export const authEndpoints = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     return httpClient.post<LoginResponse>('/admin/authentication/login', credentials);
+  },
+  changePassword: async (credentials: ChangePasswordRequest): Promise<ChangePasswordResponse> => {
+    return httpClient.post<ChangePasswordResponse>('/admin/authentication/password/change', credentials);
   },
 };
 

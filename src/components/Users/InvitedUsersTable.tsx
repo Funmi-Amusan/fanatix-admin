@@ -1,215 +1,203 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search } from 'lucide-react'
-import { Input } from '../ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { Button } from '../ui/button'
-import { 
-  getCoreRowModel, 
-  getFilteredRowModel, 
-  getPaginationRowModel, 
-  getSortedRowModel, 
-  useReactTable, 
-  flexRender,
-  type ColumnFiltersState, 
+import { Badge, Filter, Loader2, Search, X } from 'lucide-react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import {
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnFiltersState,
   type SortingState,
-} from '@tanstack/react-table'
-import { useState } from 'react'
-import { invitedUsersColumns } from './invitedUsersColumns'
-import { useUsersQuery } from '@/lib/queries/userQueries'
-
+} from '@tanstack/react-table';
+import { Input } from '../ui/input';
+import { invitedUsersColumns } from './invitedUsersColumns';
+import { userEndpoints } from '@/api/endpoints';
+import { UserDisplayTable } from './InvitedUserDisplayTable';
+import type { FetchUsersParams } from '@/api/types/users';
+import { Button } from '../ui/button';
+import { FilterModal } from '../modals/filterModal';
 
 interface InvitedUserTableProps {
   referrerCode: string;
 }
 
+const pageSize = 10;
+
 const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [globalFilter, setGlobalFilter] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [filters, setFilters] = useState<Partial<FetchUsersParams>>({});
+  const [isFilterModalOpen, setFilterModalOpen] = useState(false);
 
-  const { 
-      data: invitedUsersResponse, 
-      isLoading, 
-      error,
-      isFetching 
-    } = useUsersQuery({
-      page: currentPage,
-      limit: pageSize,
-      referrer_code: referrerCode,
-    })
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [debouncedGlobalFilter, setDebouncedGlobalFilter] = useState('');
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
-    const data = invitedUsersResponse?.data?.users ?? [];
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedGlobalFilter(globalFilter), 300);
+    return () => clearTimeout(timeout);
+  }, [globalFilter]);
 
+  const stableFiltersKey = useMemo(() => JSON.stringify(filters), [filters]);
+  const stableSortKey = useMemo(() => JSON.stringify(sorting), [sorting]);
+  const queryKey = useMemo(() => ['users', referrerCode, debouncedGlobalFilter, stableFiltersKey, stableSortKey], [
+    referrerCode,
+    debouncedGlobalFilter,
+    stableFiltersKey,
+    stableSortKey,
+  ]);
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    isLoading,
+    error,
+  } = useInfiniteQuery({
+    queryKey,
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const sortParam = sorting.length ? { sort_by_oldest: sorting[0].desc } : {};
+      const result = await userEndpoints.fetchUsers({
+        page: pageParam,
+        limit: pageSize,
+        referrer_code: referrerCode,
+        search: debouncedGlobalFilter || undefined,
+        ...filters,
+        ...sortParam,
+      });
+
+      if (!Array.isArray(result?.data?.users)) {
+        return { data: { users: [] }, meta: { totalPages: 0, currentPage: pageParam } };
+      }
+
+      return result;
+    },
+    getNextPageParam: (lastPage) => {
+      const totalPages = lastPage?.meta?.totalPages || 1;
+      const currentPage = lastPage?.meta?.currentPage || 1;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    placeholderData: prev => prev,
+    retry: false,
+  });
+
+  const users = useMemo(() => data?.pages.flatMap(page => page.data.users ?? []) ?? [], [data]);
 
   const table = useReactTable({
-    data,
+    data: users,
     columns: invitedUsersColumns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    manualFiltering: true,
+    manualSorting: true,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
     state: {
       sorting,
       columnFilters,
       globalFilter,
     },
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
-    },
-  })
+  });
+
+  const removeFilter = (filterKey: keyof FetchUsersParams) => {
+    setFilters(prev => {
+      const newFilters = { ...prev };
+      delete newFilters[filterKey];
+      return newFilters;
+    });
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    });
+
+    const currentRef = bottomRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const showSpinner = isLoading && !data;
 
   return (
     <div className="bg-white p-6 rounded-2xl">
-      {/* Table Header with Title and Search */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Invited Users</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900">Invited Users</h1>
+          <Button variant="outline" onClick={() => setFilterModalOpen(true)}>
+            <Filter className="mr-2 h-4 w-4" />
+            Filters
+          </Button>
+        </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
           <Input
             placeholder="Search invited users..."
-            value={globalFilter ?? ""}
-            onChange={(event) => setGlobalFilter(String(event.target.value))}
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
             className="pl-10 w-80"
           />
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="border-b border-gray-200 hover:bg-gray-100">
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead 
-                    key={header.id} 
-                    className="font-semibold text-gray-900 py-4 px-6 text-left"
-                  >
-                    {header.isPlaceholder ? null : (
-                      <div
-                        {...{
-                          className: header.column.getCanSort()
-                            ? 'cursor-pointer select-none flex items-center gap-1'
-                            : '',
-                          onClick: header.column.getToggleSortingHandler(),
-                        }}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {{
-                          asc: ' 🔼',
-                          desc: ' 🔽',
-                        }[header.column.getIsSorted() as string] ?? null}
-                      </div>
-                    )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row, index) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className={`
-                  border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200
-                  ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}
-                `}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell 
-                    key={cell.id}
-                    className="py-4 px-6"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell 
-                colSpan={invitedUsersColumns.length} 
-                className="h-32 text-center text-gray-500 bg-gray-50"
-              >
-                <div className="flex flex-col items-center justify-center space-y-2">
-                  <div className="text-4xl">💰</div>
-                  <div className="text-lg font-medium">No transactions found</div>
-                  <div className="text-sm">This user has no coin transactions yet</div>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-
-      {/* Pagination Controls */}
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="text-sm text-gray-600">
-          Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{' '}
-          {Math.min(
-            (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-            table.getFilteredRowModel().rows.length
-          )}{' '}
-          of {table.getFilteredRowModel().rows.length} transactions
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeft size={16} />
+      <div className="flex flex-wrap gap-2 mb-6">
+        {Object.entries(filters).map(([key, value]) => (
+          <Badge key={key} variant="secondary" className="capitalize">
+            {key.replace('_', ' ')}: {String(value)}
+            <button onClick={() => removeFilter(key as keyof FetchUsersParams)} className="ml-2 hover:text-red-600">
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        ))}
+        {Object.keys(filters).length > 0 && (
+          <Button variant="ghost" size="sm" onClick={() => setFilters({})}>
+            Clear All
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft size={16} />
-          </Button>
-          
-          <span className="flex items-center gap-1 text-sm">
-            Page
-            <strong>
-              {table.getState().pagination.pageIndex + 1} of{' '}
-              {table.getPageCount()}
-            </strong>
-          </span>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRight size={16} />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRight size={16} />
-          </Button>
-        </div>
+        )}
       </div>
-    </div>
-  )
-}
 
-export default InvitedUserTable
+      {error && (
+        <div className="text-center text-red-600 mb-4">
+          ⚠️ Failed to load users. Please check the console or try again later.
+        </div>
+      )}
+
+      {showSpinner ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <p className="text-gray-600">Loading invited users...</p>
+          </div>
+        </div>
+      ) : (
+        <UserDisplayTable
+          table={table}
+          users={users}
+          bottomRef={bottomRef}
+          isFetchingNextPage={isFetchingNextPage}
+          hasNextPage={hasNextPage}
+          debouncedGlobalFilter={debouncedGlobalFilter}
+        />
+      )}
+
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        onApplyFilters={setFilters}
+        currentFilters={filters}
+      />
+    </div>
+  );
+};
+
+export default InvitedUserTable;

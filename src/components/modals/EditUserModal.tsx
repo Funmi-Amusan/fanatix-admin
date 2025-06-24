@@ -40,7 +40,6 @@ const EditUserModal = ({ id, user, isOpen, onOpenChange, teams }: EditUserModalP
 
   const editMutation = useUpdateUserMutation();
 
-  // Update form data when user prop changes
   useEffect(() => {
     setFormData({
       username: user.username,

@@ -28,6 +28,22 @@ export const useLoginMutation = () => {
   });
 };
 
+export const useChangePasswordMutation = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: authEndpoints.changePassword,
+    onSuccess: (data) => {
+      queryClient.setQueryData(['user'], data.data.admin);
+      navigate('/login');
+    },
+    onError: (error) => {
+      console.error('Change Password failed:', error.message);
+    }
+  });
+};
+
 // export const useLogoutMutation = () => {
 //   const queryClient = useQueryClient();
 //   const navigate = useNavigate();

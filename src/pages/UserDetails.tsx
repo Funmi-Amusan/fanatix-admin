@@ -52,8 +52,6 @@ const UserDetails = () => {
     //  isFetching 
    } = useUserQuery(id || '')
 
-  
-  
    const { 
     data: allTeams, 
    //  isLoading, 
@@ -237,7 +235,7 @@ const UserDetails = () => {
     <TabsTrigger value="coinTransactions">Coin Transactions</TabsTrigger>
   </TabsList>
   <TabsContent value="invitedUsers">
-    <InvitedUsersTable referrerCode={referrerCode} />
+    <InvitedUsersTable referrerCode={inviteCode} />
   </TabsContent>
   <TabsContent value="coinTransactions"><CoinTransactionTable id={id}/></TabsContent>
 </Tabs>

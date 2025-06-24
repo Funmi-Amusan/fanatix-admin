@@ -1,10 +1,10 @@
-import type { LoginRequest } from "./types/auth";
+import type { ChangePasswordRequest, LoginRequest } from "./types/auth";
 import type { updateUser } from "./types/users";
 
 const API_BASE_URL = 'https://fanatix.usetend.com/api/v1';
 
 export const httpClient = {
-  post: async <T>(endpoint: string, data: LoginRequest, token?: string| null): Promise<T> => {
+  post: async <T>(endpoint: string, data: LoginRequest| ChangePasswordRequest, token?: string| null): Promise<T> => {
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
       };

@@ -2,6 +2,11 @@ export interface LoginRequest {
     email: string;
     password: string;
   }
+
+  export interface ChangePasswordRequest {
+    oldPassword: string;
+    newPassword: string;
+  }
   
   export interface LoginResponse {
     data: {
@@ -9,6 +14,10 @@ export interface LoginRequest {
       token: string;
     };
     refreshToken: string;
+    message: string;
+  }
+
+  export interface ChangePasswordResponse {
     message: string;
   }
   

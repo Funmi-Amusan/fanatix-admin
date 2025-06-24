@@ -23,9 +23,8 @@ const CoinTransactionTable = ({id}: {id: string}) => {
   const [globalFilter, setGlobalFilter] = useState("")
   const { data: allTransactions, isLoading, isError, error } = useTransactionsQuery(id, { page: 1, limit: 10 });
 
-  const transactions = allTransactions?.data?.transactions
+  const data = allTransactions?.data?.transactions ?? [];
 
-  const data = transactions
     const table = useReactTable({
       data,
       columns: coinTransactionColumns,

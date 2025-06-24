@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useAddCoinsMutation } from "@/hooks/useUserMutations";
+import type { Plan } from "@/api/types/wallet";
 
 interface AddCoinsModalProps {
   id: string | undefined;
@@ -25,7 +26,7 @@ const AddCoinsModal = ({ id, isOpen, onOpenChange }: AddCoinsModalProps) => {
   // const { data: plansData, isLoading: loadingPlans, isError: plansError } = usePlansQuery();
   // const plans = plansData?.data?.pricePlans ?? [];
 const loadingPlans = false
-  const plans = [];
+  const plans: Plan[] = [];
 
  const [formData, setFormData] = useState({
     plan: "",
@@ -67,7 +68,7 @@ const loadingPlans = false
   <Label htmlFor="plan">Plans</Label>
   <Select 
     value={formData.plan} 
-    onValueChange={(value) => setFormData(prev => ({ ...prev, plan: Number(value) }))}
+    onValueChange={(value) => setFormData(prev => ({ ...prev, plan: value }))}
   >
     <SelectTrigger>
       <SelectValue placeholder={loadingPlans ? "Loading plans..." : "Select plan"} />
