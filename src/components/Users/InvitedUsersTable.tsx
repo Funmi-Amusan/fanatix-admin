@@ -13,22 +13,34 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
-import { mockUserDetails } from '@/lib/data'
 import { invitedUsersColumns } from './invitedUsersColumns'
+import { useUsersQuery } from '@/lib/queries/userQueries'
 
 
 interface InvitedUserTableProps {
-  userId?: string;
+  referrerCode: string;
 }
 
-const InvitedUserTable = ({ userId }: InvitedUserTableProps) => {
+const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const data = userId 
-    ? mockUserDetails.invitedUsers || [] 
-    : mockUserDetails.invitedUsers || [];
+  const { 
+      data: invitedUsersResponse, 
+      isLoading, 
+      error,
+      isFetching 
+    } = useUsersQuery({
+      page: currentPage,
+      limit: pageSize,
+      referrer_code: referrerCode,
+    })
+
+    const data = invitedUsersResponse?.data?.users ?? [];
+
 
   const table = useReactTable({
     data,

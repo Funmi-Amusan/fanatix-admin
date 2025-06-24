@@ -20,13 +20,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ArrowUp, Users, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2 } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { columns } from "@/components/Users/userListTableColumns"
 import type { User } from "@/api/types/users"
 import { useUsersQuery } from "@/lib/queries/userQueries"
 import { useUser } from "@/hooks/useUser"
-import { getAuthTokens } from '@/lib/storage';
 
 export default function UsersList({
   columns: propColumns = columns,
@@ -34,8 +33,6 @@ export default function UsersList({
   columns?: ColumnDef<User, unknown>[]
 }) {
   const { data: user, isLoading: isAuthLoading } = useUser();
-  const { token } = getAuthTokens();
-  console.log(" const { token } = getAuthTokens();", token)
 
   const navigate = useNavigate()
 

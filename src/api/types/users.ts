@@ -50,7 +50,19 @@ export interface FetchUsersParams {
     page?: number;
     limit?: number;
     search?: string;
-    role?: string;
+    // role?: string;
+    team_id?: string;
+    name?: string;
+    email?: string;
+    verified?: boolean;
+    email_verified?: boolean;
+    identity_verified?: boolean;
+    invite_code?: string;
+    referrer_code?: string;
+    username?: string;
+    start_date?: string;
+    end_date?: string;
+    sort_by_oldest?: boolean;
 }
   
   interface Wallet {

@@ -78,7 +78,7 @@ const UserDetails = () => {
     )
   }
 
-  const { name, email, emailVerified, fanSince, teamId, squadNumber, username, inviteCode, createdAt, updatedAt, inviteDeactivated, teams, wallet} = userDetails.data.fan
+  const { name, email, emailVerified, fanSince, teamId, squadNumber, username, inviteCode, referrerCode, createdAt, updatedAt, inviteDeactivated, teams, wallet} = userDetails.data.fan
 
   const getVerificationBadge = (verified: boolean, label: string) => (
     <div className={` flex items-center w-fit ${verified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"} `}>
@@ -199,7 +199,7 @@ const UserDetails = () => {
                   </div>
                   <div>
                     <Label>Invite Code Used</Label>
-                    <p className="mt-1 font-mono text-gray-900">{inviteCode || 'None'}</p>
+                    <p className="mt-1 font-mono text-gray-900">{referrerCode || 'None'}</p>
                   </div>
                   <div>
                     <Label>Email Verification</Label>
@@ -237,7 +237,7 @@ const UserDetails = () => {
     <TabsTrigger value="coinTransactions">Coin Transactions</TabsTrigger>
   </TabsList>
   <TabsContent value="invitedUsers">
-    <InvitedUsersTable />
+    <InvitedUsersTable referrerCode={referrerCode} />
   </TabsContent>
   <TabsContent value="coinTransactions"><CoinTransactionTable id={id}/></TabsContent>
 </Tabs>

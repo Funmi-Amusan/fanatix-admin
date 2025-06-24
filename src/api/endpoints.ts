@@ -16,13 +16,11 @@ export const authEndpoints = {
 export const userEndpoints = {
     fetchUsers: async (params: FetchUsersParams = {}): Promise<UsersResponse> => {
       const { token } = getAuthTokens();
-      const queryString = new URLSearchParams({
-        page: (params.page || 1).toString(),
-        limit: (params.limit || 10).toString(),
-        ...(params.search && { search: params.search }),
-        ...(params.role && { role: params.role }),
-      }).toString();
-      
+      const queryString = new URLSearchParams(
+        Object.entries(params)
+          .filter(([, value]) => value !== undefined && value !== null)
+          .map(([key, value]) => [key, String(value)])
+      ).toString();      
       return httpClient.get<UsersResponse>(`/admin/user?${queryString}`, token);
     },
   

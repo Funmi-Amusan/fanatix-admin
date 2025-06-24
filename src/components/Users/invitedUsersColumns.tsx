@@ -1,48 +1,67 @@
-import type { InviteUsage } from "@/store/schemas/interfaces";
+import type { User } from "@/api/types/users";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Coins } from "lucide-react";
 
-export const invitedUsersColumns: ColumnDef<InviteUsage>[] = [
+export const invitedUsersColumns: ColumnDef<User>[] = [
   {
-    accessorKey: "usedBy",
-    header: "Invited User ID",
+    accessorKey: "username",
+    header: "Username",
     cell: ({ row }) => {
-      return <div className="font-mono text-sm">{row.getValue("usedBy")}</div>
+      return (
+        <span>{row.original.username}</span> 
+      );
     },
   },
   {
-    accessorKey: "usedByEmail",
-    header: "Invited User Email",
+    accessorKey: "email",
+    header: "Email",
     cell: ({ row }) => {
-      return <div className="font-mono text-sm">{row.getValue("usedByEmail")}</div>
+      return (
+        <span>{row.original.email}</span> 
+      );
     },
   },
   {
-    accessorKey: "usedByName",
-    header: "Invited User Name",
+    accessorKey: "inviteCode",
+    header: "Invite Code",
     cell: ({ row }) => {
-      return <div className="font-mono text-sm">{row.getValue("usedByName")}</div>
+      return (
+        <span>{row.original.inviteCode}</span> 
+      );
     },
   },
   {
-    accessorKey: "usedAt",
-    header: "Used At",
+    accessorKey: "wallet.balance", 
+    header: "Coins",
     cell: ({ row }) => {
-      const date = new Date(row.getValue("usedAt"));
-      return <div className="text-gray-500 text-sm">{date.toLocaleDateString()}</div>;
+      const amount = parseFloat(row.original.wallet.balance);
+   
+      return (
+        <div className="flex items-center gap-2">
+          <Coins className="h-4 w-4 text-yellow-500" />
+          <span>{amount}</span>
+        </div>
+      );
     },
   },
   {
-    accessorKey: "rewardGiven",
-    header: "Coins Given",
+    accessorKey: "emailVerified",
+    header: "Email Verified",
     cell: ({ row }) => {
-      return <div className="text-gray-500 text-sm">{row.getValue("rewardGiven")}</div>;
+      const verified = row.original.emailVerified; 
+      return (
+        <span>
+          {verified ? "Verified" : "Unverified"}
+        </span>
+      );
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "createdAt",
+    header: "Created Date",
     cell: ({ row }) => {
-      return <div className="text-gray-500 text-sm">{row.getValue("status")}</div>;
+      const date = new Date(row.original.createdAt);
+      return <span>{date.toLocaleDateString()}</span>;
     },
   },
 ];
