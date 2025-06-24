@@ -1,6 +1,6 @@
 import { getAuthTokens } from '@/lib/storage';
 import { httpClient } from './httpClient';
-import type { ChangePasswordRequest, ChangePasswordResponse, LoginRequest, LoginResponse } from './types/auth';
+import type { addAdminRequest, addAdminResponse, ChangePasswordRequest, ChangePasswordResponse, FetchAdminsParams, LoginRequest, LoginResponse } from './types/auth';
 import type { FetchUsersParams, updateUser, User, UserResponse, UsersResponse } from './types/users';
 import type { FetchFixturesParams, FixtureResponse, FixturesResponse } from './types/fixtures';
 import type { FetchTeamsParams, TeamsResponse } from './types/teams';
@@ -13,6 +13,24 @@ export const authEndpoints = {
   },
   changePassword: async (credentials: ChangePasswordRequest): Promise<ChangePasswordResponse> => {
     return httpClient.post<ChangePasswordResponse>('/admin/authentication/password/change', credentials);
+  },
+};
+
+export const adminEndpoints = {
+  fetchAdmins: async (params: FetchAdminsParams = {}): Promise<UsersResponse> => {
+    const { token } = getAuthTokens();
+    const queryString = new URLSearchParams(
+      Object.entries(params)
+        .filter(([, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => [key, String(value)])
+    ).toString();      
+    return httpClient.get<UsersResponse>(`/admin?${queryString}`, token);
+  },
+  addAdmin: async (credentials: addAdminRequest): Promise<addAdminResponse> => {
+    return httpClient.post<addAdminResponse>('/admin/add', credentials);
+  },
+  deleteAdmin: async (adminId: string): Promise<addAdminResponse> => {
+    return httpClient.delete<addAdminResponse>(`/admin/add${adminId}`, );
   },
 };
 

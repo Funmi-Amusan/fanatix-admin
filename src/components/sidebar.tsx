@@ -1,5 +1,4 @@
-import { Calendar, User, Users } from "lucide-react"
-
+import { Calendar, User, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,10 +8,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
-// Menu items.
-const items = [
+const mainItems = [
   {
     title: "Users",
     url: "/users",
@@ -23,35 +21,51 @@ const items = [
     url: "/fixtures",
     icon: Calendar,
   },
-  {
-    title: "Profile",
-    url: "/profile",
-    icon: User,
-  },
-]
+];
+
+const profileItem = {
+  title: "Profile",
+  url: "/profile",
+  icon: User,
+};
 
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Fanatix Admin</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarContent className="flex flex-col justify-between h-full">
+        <div>
+          <SidebarGroup>
+            <SidebarGroupLabel>Fanatix Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {mainItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </div>
+
+        <div className="mb-4">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href={profileItem.url}>
+                  <profileItem.icon />
+                  <span>{profileItem.title}</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </div>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }

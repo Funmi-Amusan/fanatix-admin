@@ -50,7 +50,6 @@ export interface FetchUsersParams {
     page?: number;
     limit?: number;
     search?: string;
-    // role?: string;
     team_id?: string;
     name?: string;
     email?: string;
