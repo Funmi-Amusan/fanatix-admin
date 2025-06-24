@@ -1,4 +1,5 @@
-import { fixtureEndpoints } from '@/api/endpoints';
+
+import { fixtureEndpoints } from '@/api/endpoints/fixtureEndpoints';
 import type { FetchFixturesParams, FixtureChatRoomUsersResponse, FixtureResponse, FixturesResponse } from '@/api/types/fixtures';
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 
@@ -35,7 +36,7 @@ export const useFixtureChatRoomUsersQuery = (
 ) => {
   return useQuery({
     queryKey: ['fixture chat room users', fixtureId],
-    queryFn: () => fixtureEndpoints.fetchFixtureChatRoomUsers(fixtureId),
+    queryFn: () => fixtureEndpoints.fetchFixtureChatRoomUsers(Number(fixtureId)),
     enabled: !!fixtureId, 
     staleTime: 5 * 60 * 1000, 
     gcTime: 10 * 60 * 1000, 

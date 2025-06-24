@@ -13,26 +13,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Loader2, Filter as FilterIcon } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQueryClient } from '@tanstack/react-query'
 import { columns as defaultColumns } from '@/components/Fixtures/fixturesListTableColumns'
-import { fixtureEndpoints } from '@/api/endpoints'
+import type { Fixture } from '@/api/types/fixtures'
+import { useUser } from '@/hooks/useUser'
+import { fixtureEndpoints } from '@/api/endpoints/fixtureEndpoints'
 
 interface FixturesListProps {
   columns?: ColumnDef<Fixture, unknown>[]
 }
 
 export default function FixturesList({ columns = defaultColumns }: FixturesListProps) {
+  const { data: loggedInUser, isLoading: isAuthLoading } = useUser()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const user = queryClient.getQueryData(['user']) as any
 
   const bottomRef = useRef<HTMLDivElement | null>(null)
-
 
   const {
     data,
@@ -43,13 +41,13 @@ export default function FixturesList({ columns = defaultColumns }: FixturesListP
     error,
   } = useInfiniteQuery({
     queryKey: ['fixtures'],
-    initialPageParam: 1,
-    queryFn: async ({ pageParam = 1 }) =>
-      fixtureEndpoints.fetchFixtures({ page: pageParam, limit: 10 }),
+    initialPageParam: '1',
+    queryFn: async ({ pageParam = '1' }) =>
+      fixtureEndpoints.fetchFixtures({ page: Number(pageParam), limit: 10 }),
     getNextPageParam: (lastPage, pages) => {
       const current = lastPage.meta?.currentPage ?? pages.length
       const total = lastPage.meta?.totalPages ?? 1
-      return current < total ? current + 1 : undefined
+      return current < total ? String(current + 1) : undefined
     },
   })
   
@@ -72,17 +70,25 @@ export default function FixturesList({ columns = defaultColumns }: FixturesListP
     })
     const ref = bottomRef.current
     if (ref) observer.observe(ref)
-    return () => ref && observer.unobserve(ref)
-  }, [bottomRef.current, hasNextPage, isFetchingNextPage])
+    return () => {
+      if (ref) observer.unobserve(ref)
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
 
   const handleRowClick = (fixture: Fixture) => {
     navigate(`/fixtures/${fixture.ID}`)
   }
 
+  if (isAuthLoading) return <div>Loading...</div>
+  if (!loggedInUser) {
+    navigate('/login')
+  }
+
   return (
     <div className="w-full p-8 bg-gray-100">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Hello {user?.name} 👋</h2>
+        <h2 className="text-xl font-bold">Hello {loggedInUser?.name} 👋</h2>
        
       </div>
 

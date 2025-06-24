@@ -15,8 +15,8 @@ const ChangePassword = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLButtonElement | HTMLInputElement>) => {
     e.preventDefault();
-    if (!currentPassword || !newPassword) return;
-    changePasswordMutation.mutate({ currentPassword, newPassword });
+    // if (!currentPassword || !newPassword) return;
+    // changePasswordMutation.mutate({ currentPassword, newPassword });
   };
 
   return (

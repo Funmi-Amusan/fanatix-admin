@@ -93,6 +93,7 @@ const maxDate = tomorrow.toISOString().split('T')[0];
               <Input
                 id={field.id}
                 name={field.id}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 value={(localFilters as any)[field.id] || ''}
                 onChange={handleInputChange}
                 className="col-span-3"
@@ -126,12 +127,7 @@ const maxDate = tomorrow.toISOString().split('T')[0];
               type="date"
               max={maxDate}
               value={localFilters.end_date || ''}
-              onChange={(e) =>
-                setLocalFilters((prev) => ({
-                  ...prev,
-                  end_date: formatToAPIDate(e.target.value),
-                }))
-              }
+              onChange={handleInputChange}
               className="col-span-3"
             />
           </div>

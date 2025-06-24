@@ -1,4 +1,5 @@
-import { userEndpoints, walletEndpoints } from "@/api/endpoints";
+import { userEndpoints } from "@/api/endpoints/userEndpoints";
+import { walletEndpoints } from "@/api/endpoints/walletEndpoints";
 import type { updateUser } from "@/api/types/users";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -48,10 +49,11 @@ export const useCreateUserMutation = () => {
 
   export const useDeactivateUserInviteCodeMutation = () => {
     const queryClient = useQueryClient();
-    return useMutation({
+
+    return useMutation<{ message: string }, unknown, { userId: string }>({
       mutationFn: ({ userId }: { userId: string;  }) => 
         userEndpoints.deactivateUserInviteCode(userId),
-      onSuccess: (variables) => {
+      onSuccess: (_data, variables) => {
         queryClient.invalidateQueries({ queryKey: ['users'] });
         queryClient.invalidateQueries({ queryKey: ['user', variables.userId] });
       },
@@ -63,15 +65,14 @@ export const useCreateUserMutation = () => {
 
   export const useActivateUserInviteCodeMutation = () => {
     const queryClient = useQueryClient();
-    
-    return useMutation({
+
+    return useMutation<{ message: string }, unknown, { userId: string }>({
       mutationFn: ({ userId }: { userId: string;  }) => 
         userEndpoints.activateUserInviteCode(userId),
-      onSuccess: (variables) => {
+      onSuccess: (_data, variables) => {
         queryClient.invalidateQueries({ queryKey: ['users'] });
         queryClient.invalidateQueries({ queryKey: ['user', variables.userId] });
-      },
-      onError: (error) => {
+      },      onError: (error) => {
         console.error('Failed to activate invite code::', error);
       }
     });
@@ -80,12 +81,12 @@ export const useCreateUserMutation = () => {
   export const useChangeeUserInviteCodeMutation = () => {
     const queryClient = useQueryClient();
     
-    return useMutation({
-      mutationFn: userEndpoints.changeUserInviteCode,
-      onSuccess: (variables) => {
+    return useMutation<{ message: string }, unknown, { userId: string }>({
+      mutationFn: ({ userId }: { userId: string }) =>
+        userEndpoints.changeUserInviteCode(userId),
+      onSuccess: (_data, variables) => {
         queryClient.invalidateQueries({ queryKey: ['users'] });
         queryClient.invalidateQueries({ queryKey: ['user', variables.userId] });
-        console.log('successfully changed')
       },
       onError: (error) => {
         console.error('Failed to change invite code::', error);
@@ -96,14 +97,13 @@ export const useCreateUserMutation = () => {
   export const useAddCoinsMutation = () => {
     const queryClient = useQueryClient();
     
-    return useMutation({
+    return useMutation<{ message: string }, unknown, { planId: string }>({
       mutationFn: ({ planId }: { planId: string;  }) => 
         walletEndpoints.buyPlans(planId),
-      onSuccess: (variables) => {
+      onSuccess: (_data, variables) => {
         queryClient.invalidateQueries({ queryKey: ['transactions'] });
         queryClient.invalidateQueries({ queryKey: ['user', variables.planId] });
-      },
-      onError: (error) => {
+      },      onError: (error) => {
         console.error('Failed to add coins:', error);
       }
     });

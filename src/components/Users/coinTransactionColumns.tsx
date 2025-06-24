@@ -1,5 +1,4 @@
-
-import type { Transaction } from "@/api/types/transactions";
+import type { Transaction } from "@/api/types/wallet";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Coins } from "lucide-react";
 

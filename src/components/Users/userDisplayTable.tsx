@@ -2,10 +2,7 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { flexRender, type Table as TanstackTable } from '@tanstack/react-table';
-
-interface User {
-  [key: string]: any; 
-}
+import type { User } from '@/api/types/users';
 
 interface UserDisplayTableProps {
   table: TanstackTable<User>;

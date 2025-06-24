@@ -9,12 +9,10 @@ import {
 } from '@tanstack/react-table'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { Input } from '../ui/input'
-import { Search, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { coinTransactionColumns } from './coinTransactionColumns'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { walletEndpoints } from '@/api/endpoints'
-
+import { walletEndpoints } from '@/api/endpoints/walletEndpoints'
 const pageSize = 10
 
 const CoinTransactionTable = ({ id }: { id: string }) => {
@@ -46,8 +44,8 @@ const CoinTransactionTable = ({ id }: { id: string }) => {
       return result
     },
     getNextPageParam: (lastPage, pages) => {
-      const current = lastPage?.meta?.currentPage ?? pages.length
-      const total = lastPage?.meta?.totalPages ?? 1
+      const current = Number(lastPage?.meta?.currentPage ?? pages.length)
+      const total = Number(lastPage?.meta?.totalPages ?? 1)
       return current < total ? current + 1 : undefined
     },
     retry: false,
@@ -81,9 +79,10 @@ const CoinTransactionTable = ({ id }: { id: string }) => {
     })
     const el = bottomRef.current
     if (el) observer.observe(el)
-    return () => el && observer.unobserve(el)
-  }, [bottomRef.current, hasNextPage, isFetchingNextPage, fetchNextPage])
-
+    return () => {
+      if (el) observer.unobserve(el)
+    }
+  }, [bottomRef, hasNextPage, isFetchingNextPage, fetchNextPage])
   if (isLoading) {
     return (
       <div className="p-6 text-center text-gray-500">
@@ -179,6 +178,6 @@ const CoinTransactionTable = ({ id }: { id: string }) => {
       </div>
     </div>
   )
-}
 
+}
 export default CoinTransactionTable

@@ -19,12 +19,10 @@ interface ChangeInviteCodeModalProps {
 const ChangeInviteCodeModal =({ id, isOpen, onOpenChange }: ChangeInviteCodeModalProps) => {
  const ChangeInviteCodeMutation = useChangeeUserInviteCodeMutation();
   const handleChangeCode = () => {
-    console.log('id', id)
     if(!id) return
-    ChangeInviteCodeMutation.mutate(id)
+    ChangeInviteCodeMutation.mutate({userId: id})
   }
-
-  return (
+    return (
 <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

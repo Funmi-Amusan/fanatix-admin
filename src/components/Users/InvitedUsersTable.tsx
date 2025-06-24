@@ -9,12 +9,12 @@ import {
   type SortingState,
 } from '@tanstack/react-table';
 import { invitedUsersColumns } from './invitedUsersColumns';
-import { userEndpoints } from '@/api/endpoints';
 import { UserDisplayTable } from './InvitedUserDisplayTable';
 import type { FetchUsersParams } from '@/api/types/users';
 import { Button } from '../ui/button';
 import { FilterModal } from '../modals/filterModal';
 import { Badge } from '../ui/badge';
+import { userEndpoints } from '@/api/endpoints/userEndpoints';
 
 interface InvitedUserTableProps {
   referrerCode: string;
@@ -28,20 +28,13 @@ const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [debouncedGlobalFilter, setDebouncedGlobalFilter] = useState('');
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedGlobalFilter(globalFilter), 300);
-    return () => clearTimeout(timeout);
-  }, [globalFilter]);
 
   const stableFiltersKey = useMemo(() => JSON.stringify(filters), [filters]);
   const stableSortKey = useMemo(() => JSON.stringify(sorting), [sorting]);
-  const queryKey = useMemo(() => ['users', referrerCode, debouncedGlobalFilter, stableFiltersKey, stableSortKey], [
+  const queryKey = useMemo(() => ['users', referrerCode, stableFiltersKey, stableSortKey], [
     referrerCode,
-    debouncedGlobalFilter,
     stableFiltersKey,
     stableSortKey,
   ]);
@@ -62,7 +55,6 @@ const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
         page: pageParam,
         limit: pageSize,
         referrer_code: referrerCode,
-        search: debouncedGlobalFilter || undefined,
         ...filters,
         ...sortParam,
       });
@@ -76,7 +68,7 @@ const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
     getNextPageParam: (lastPage) => {
       const totalPages = lastPage?.meta?.totalPages || 1;
       const currentPage = lastPage?.meta?.currentPage || 1;
-      return currentPage < totalPages ? currentPage + 1 : undefined;
+      return Number(currentPage) < Number(totalPages) ? Number(currentPage) + 1 : undefined;
     },
     placeholderData: prev => prev,
     retry: false,
@@ -95,8 +87,7 @@ const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
     onColumnFiltersChange: setColumnFilters,
     state: {
       sorting,
-      columnFilters,
-      globalFilter,
+      columnFilters
     },
   });
 
@@ -176,7 +167,6 @@ const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
           bottomRef={bottomRef}
           isFetchingNextPage={isFetchingNextPage}
           hasNextPage={hasNextPage}
-          debouncedGlobalFilter={debouncedGlobalFilter}
         />
       )}
 

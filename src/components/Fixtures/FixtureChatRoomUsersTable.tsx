@@ -17,7 +17,7 @@ import {
   } from '@/components/ui/table';
   import { Loader2 } from 'lucide-react';
   import { useEffect, useMemo, useRef } from 'react';
-  import { fixtureEndpoints } from '@/api/endpoints';
+import { fixtureEndpoints } from '@/api/endpoints/fixtureEndpoints';
   
   interface ChatRoomUser {
     id: string;
@@ -67,11 +67,10 @@ import {
       },
       initialPageParam: 1,
       getNextPageParam: (lastPage, pages) => {
-        const current = lastPage?.meta?.currentPage ?? pages.length;
-        const total = lastPage?.meta?.totalPages ?? 1;
+        const current = pages.length;
+        const total = Math.ceil(lastPage?.data?.users?.length / pageSize) || 1;
         return current < total ? current + 1 : undefined;
-      },
-      enabled: !!fixtureId,
+      },      enabled: !!fixtureId,
       staleTime: 5 * 60 * 1000,
     });
   
@@ -80,7 +79,7 @@ import {
       [data]
     );
   
-    const columns = useMemo<ColumnDef<ChatRoomUser, any>[]>(() => [
+    const columns = useMemo<ColumnDef<ChatRoomUser, unknown>[]>(() => [
       {
         accessorKey: 'username',
         header: 'Username',
@@ -116,8 +115,10 @@ import {
       const el = bottomRef.current;
       if (el) observer.observe(el);
   
-      return () => el && observer.unobserve(el);
-    }, [bottomRef.current, hasNextPage, isFetchingNextPage]);
+      return () => {
+        if (el) observer.unobserve(el);
+      };
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
   
     if (isLoading) {
       return (
@@ -184,4 +185,3 @@ import {
       </div>
     );
   }
-  

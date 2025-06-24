@@ -30,6 +30,10 @@ export interface updateUser {
 }
 
 export interface UsersResponse {
+    meta: {
+      currentPage: string;
+      totalPages:string
+    };
     data: {
         users: User[]
     }

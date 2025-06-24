@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { addAdminRequest } from '@/api/types/auth';
 import { Trash2 } from 'lucide-react';
 import { useAddAdminMutation, useDeleteAdminMutation } from '@/hooks/useAdminMutations';
 import { useAdminsQuery } from '@/lib/queries/adminQueries';
+import { useUser } from '@/hooks/useUser';
+import type { addAdminRequest } from '@/api/types/admins';
 
 const Profile = () => {
-  const queryClient = useQueryClient();
-  const user = queryClient.getQueryData(['user']) as any;
+  const { data: loggedInUser, isLoading: isAuthLoading } = useUser()
 
   const { data, isLoading, isError, error } = useAdminsQuery({ page: 1, limit: 100 });
   const addAdmin = useAddAdminMutation();
@@ -22,17 +21,21 @@ const Profile = () => {
     name: '',
     email: '',
     password: '',
-    roles: ['viewer'],
+    roles: 'viewer',
   });
 
   const handleAddAdmin = () => {
     if (!newAdmin.name || !newAdmin.email || !newAdmin.password) return;
     addAdmin.mutate(newAdmin, {
       onSuccess: () => {
-        setNewAdmin({ name: '', email: '', password: '', roles: ['viewer'] });
+        setNewAdmin({ name: '', email: '', password: '', roles: 'viewer' });
       },
     });
   };
+
+  if (isAuthLoading) return <div>Loading...</div>
+
+  console.log("loggedin user", loggedInUser)
 
   return (
     <main className="p-6 max-w-4xl mx-auto">
@@ -41,9 +44,9 @@ const Profile = () => {
           <CardTitle>Your Profile</CardTitle>
         </CardHeader>
         <CardContent>
-          <p><strong>Name:</strong> {user?.name}</p>
-          <p><strong>Email:</strong> {user?.email}</p>
-          <p><strong>Roles:</strong> {user?.roles?.join(', ')}</p>
+          <p><strong>Name:</strong> {loggedInUser?.name}</p>
+          <p><strong>Email:</strong> {loggedInUser?.email}</p>
+          <p><strong>Roles:</strong> {loggedInUser?.roles?.join(', ')}</p>
         </CardContent>
       </Card>
 
@@ -128,5 +131,4 @@ const Profile = () => {
     </main>
   );
 };
-
 export default Profile;

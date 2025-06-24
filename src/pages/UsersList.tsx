@@ -5,7 +5,6 @@ import {
   getFilteredRowModel,
   useReactTable,
   type SortingState,
-  type ColumnFiltersState,
   type ColumnDef,
 } from '@tanstack/react-table'
 import {
@@ -27,15 +26,15 @@ import { useUser } from '@/hooks/useUser'
 import { useNavigate } from 'react-router-dom'
 import { columns as defaultColumns } from '@/components/Users/userListTableColumns'
 import { FilterModal } from '@/components/modals/filterModal'
-import { userEndpoints } from '@/api/endpoints'
 import type { User, FetchUsersParams } from '@/api/types/users'
+import { userEndpoints } from '@/api/endpoints/userEndpoints'
 
 interface UsersListProps {
   columns?: ColumnDef<User, unknown>[]
 }
 
 export default function UsersList({ columns = defaultColumns }: UsersListProps) {
-  const { data: user, isLoading: isAuthLoading } = useUser()
+  const { data: loggedInUser, isLoading: isAuthLoading } = useUser()
   const navigate = useNavigate()
 
   const [sorting, setSorting] = useState<SortingState>([])
@@ -76,7 +75,7 @@ export default function UsersList({ columns = defaultColumns }: UsersListProps) 
     getNextPageParam: (lastPage, allPages) => {
       const current = lastPage?.meta?.currentPage ?? allPages.length
       const total = lastPage?.meta?.totalPages ?? 1
-      return current < total ? current + 1 : undefined
+      return current < total ? Number(current) + 1 : undefined
     },
     placeholderData: prev => prev,
     retry: false,
@@ -108,7 +107,9 @@ export default function UsersList({ columns = defaultColumns }: UsersListProps) 
 
     const ref = bottomRef.current
     if (ref) observer.observe(ref)
-    return () => ref && observer.unobserve(ref)
+    return () => {
+      if (ref) observer.unobserve(ref)
+    }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const handleRowClick = (user: User) => {
@@ -116,12 +117,14 @@ export default function UsersList({ columns = defaultColumns }: UsersListProps) 
   }
 
   if (isAuthLoading) return <div>Loading...</div>
-  if (!user) return <div>Please login</div>
+  if (!loggedInUser) {
+    navigate('/login')
+  }
 
   return (
     <div className="w-full min-h-screen p-8 bg-gray-100">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Hello {user.name} 👋</h2>
+        <h2 className="text-xl font-bold">Hello {loggedInUser?.name} 👋</h2>
         <Button variant="outline" onClick={() => setFilterModalOpen(true)}>
           <FilterIcon className="w-4 h-4 mr-2" />
           Filters

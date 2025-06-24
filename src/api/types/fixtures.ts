@@ -7,6 +7,10 @@ export interface FixtureResponse {
   };
 }
 export interface FixturesResponse {
+  meta: {
+    currentPage: string;
+    totalPages:string
+  };
   message: string;
   data: {
     fixtures: Fixture[];

@@ -2,18 +2,15 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { flexRender, type Table as TanstackTable } from '@tanstack/react-table';
+import type { User } from '@/api/types/users';
 
-interface User {
-  [key: string]: any; 
-}
 
 interface UserDisplayTableProps {
   table: TanstackTable<User>;
   users: User[];
-  bottomRef: React.RefObject<HTMLDivElement>;
+  bottomRef: React.RefObject<HTMLDivElement|null>;
   isFetchingNextPage: boolean;
   hasNextPage: boolean | undefined;
-  debouncedGlobalFilter: string;
 }
 
 export const UserDisplayTable = React.memo(({
@@ -21,8 +18,7 @@ export const UserDisplayTable = React.memo(({
   users,
   bottomRef,
   isFetchingNextPage,
-  hasNextPage,
-  debouncedGlobalFilter,
+  hasNextPage
 }: UserDisplayTableProps) => {
   return (
     <>
@@ -64,17 +60,10 @@ export const UserDisplayTable = React.memo(({
           ) : (
             <TableRow>
               <TableCell colSpan={table.getAllColumns().length} className="text-center py-12 text-gray-500">
-                {debouncedGlobalFilter ? (
-                  <>
-                    <div className="text-xl mb-2">🔍</div>
-                    <p>No users found matching “{debouncedGlobalFilter}”</p>
-                  </>
-                ) : (
-                  <>
+              <>
                     <div className="text-xl mb-2">👥</div>
                     <p>No invited users yet</p>
                   </>
-                )}
               </TableCell>
             </TableRow>
           )}
@@ -96,5 +85,4 @@ export const UserDisplayTable = React.memo(({
   );
 });
 
-// Set a display name for easier debugging in React DevTools
 UserDisplayTable.displayName = 'UserDisplayTable';

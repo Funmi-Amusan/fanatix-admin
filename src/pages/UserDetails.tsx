@@ -29,7 +29,7 @@ import EditUserModal from "@/components/modals/EditUserModal"
 import DeleteUserModal from "@/components/modals/DeleteUserModal"
 import { useTeamsQuery } from "@/lib/queries/teamQueries"
 import DeactivateInviteCodeModal from "@/components/modals/DeactivateInviteCodeModal"
-import ActivateInviteCodeModal from "@/components/modals/ActivateInviteCodeModal copy"
+import ActivateInviteCodeModal from "@/components/modals/ActivateInviteCodeModal"
 import ChangeInviteCodeModal from "@/components/modals/ChangeInviteCodeModal"
 import AddCoinsModal from "@/components/modals/addCoinsModal"
 
@@ -237,7 +237,9 @@ const UserDetails = () => {
   <TabsContent value="invitedUsers">
     <InvitedUsersTable referrerCode={inviteCode} />
   </TabsContent>
+  {id &&
   <TabsContent value="coinTransactions"><CoinTransactionTable id={id}/></TabsContent>
+  }
 </Tabs>
         </div>
         <EditUserModal 
