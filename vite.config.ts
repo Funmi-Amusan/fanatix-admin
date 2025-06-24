@@ -11,4 +11,17 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          table: ['@tanstack/react-table'],
+          icons: ['lucide-react'],
+          query: ['@tanstack/react-query'],
+        },
+      },
+    },
+  },
 })
+
+
