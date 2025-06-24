@@ -1,4 +1,4 @@
-import { Badge, Filter, Loader2, Search, X } from 'lucide-react';
+import { Filter, Loader2, X } from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import {
@@ -8,13 +8,13 @@ import {
   type ColumnFiltersState,
   type SortingState,
 } from '@tanstack/react-table';
-import { Input } from '../ui/input';
 import { invitedUsersColumns } from './invitedUsersColumns';
 import { userEndpoints } from '@/api/endpoints';
 import { UserDisplayTable } from './InvitedUserDisplayTable';
 import type { FetchUsersParams } from '@/api/types/users';
 import { Button } from '../ui/button';
 import { FilterModal } from '../modals/filterModal';
+import { Badge } from '../ui/badge';
 
 interface InvitedUserTableProps {
   referrerCode: string;
@@ -51,7 +51,6 @@ const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isFetching,
     isLoading,
     error,
   } = useInfiniteQuery({
@@ -132,22 +131,13 @@ const InvitedUserTable = ({ referrerCode }: InvitedUserTableProps) => {
   return (
     <div className="bg-white p-6 rounded-2xl">
       <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900">Invited Users</h1>
+    
           <Button variant="outline" onClick={() => setFilterModalOpen(true)}>
             <Filter className="mr-2 h-4 w-4" />
             Filters
           </Button>
-        </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-          <Input
-            placeholder="Search invited users..."
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="pl-10 w-80"
-          />
-        </div>
+     
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">

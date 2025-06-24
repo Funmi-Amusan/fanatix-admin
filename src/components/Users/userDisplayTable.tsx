@@ -96,5 +96,4 @@ export const UserDisplayTable = React.memo(({
   );
 });
 
-// Set a display name for easier debugging in React DevTools
 UserDisplayTable.displayName = 'UserDisplayTable';

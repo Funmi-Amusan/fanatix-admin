@@ -1,296 +1,238 @@
 import {
-  type ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getSortedRowModel,
+  getFilteredRowModel,
   useReactTable,
   type SortingState,
   type ColumnFiltersState,
-} from "@tanstack/react-table"
-import { useState } from "react"
+  type ColumnDef,
+} from '@tanstack/react-table'
+import {
+  Loader2,
+  Filter as FilterIcon,
+} from 'lucide-react'
 import {
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2 } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-import { columns } from "@/components/Users/userListTableColumns"
-import type { User } from "@/api/types/users"
-import { useUsersQuery } from "@/lib/queries/userQueries"
-import { useUser } from "@/hooks/useUser"
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useUser } from '@/hooks/useUser'
+import { useNavigate } from 'react-router-dom'
+import { columns as defaultColumns } from '@/components/Users/userListTableColumns'
+import { FilterModal } from '@/components/modals/filterModal'
+import { userEndpoints } from '@/api/endpoints'
+import type { User, FetchUsersParams } from '@/api/types/users'
 
-export default function UsersList({
-  columns: propColumns = columns,
-}: {
+interface UsersListProps {
   columns?: ColumnDef<User, unknown>[]
-}) {
-  const { data: user, isLoading: isAuthLoading } = useUser();
+}
 
+export default function UsersList({ columns = defaultColumns }: UsersListProps) {
+  const { data: user, isLoading: isAuthLoading } = useUser()
   const navigate = useNavigate()
 
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [globalFilter, setGlobalFilter] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [filters, setFilters] = useState<Partial<FetchUsersParams>>({})
+  const [filterModalOpen, setFilterModalOpen] = useState(false)
 
-  const { 
-    data: usersResponse, 
-    isLoading, 
+  const bottomRef = useRef<HTMLDivElement | null>(null)
+
+  const stableSortKey = useMemo(() => JSON.stringify(sorting), [sorting])
+  const stableFilterKey = useMemo(() => JSON.stringify(filters), [filters])
+
+  const queryKey = useMemo(() => ['users', stableSortKey, stableFilterKey], [
+    stableSortKey,
+    stableFilterKey,
+  ])
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    isLoading,
     error,
-    isFetching 
-  } = useUsersQuery({
-    page: currentPage,
-    limit: pageSize,
-    search: globalFilter || undefined,
+  } = useInfiniteQuery({
+    queryKey,
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const sortParam = sorting.length > 0 ? { sort_by_oldest: sorting[0].desc } : {}
+      const result = await userEndpoints.fetchUsers({
+        page: pageParam,
+        limit: 10,
+        ...filters,
+        ...sortParam,
+      })
+      return result
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      const current = lastPage?.meta?.currentPage ?? allPages.length
+      const total = lastPage?.meta?.totalPages ?? 1
+      return current < total ? current + 1 : undefined
+    },
+    placeholderData: prev => prev,
+    retry: false,
+    staleTime: 5 * 60 * 1000,
   })
-  
-  const users = usersResponse?.data?.users || []
-  const totalUsers = usersResponse?.total || 0
-  const totalPages = Math.ceil(totalUsers / pageSize)
+
+  const users = useMemo(() => data?.pages.flatMap(p => p.data.users ?? []) ?? [], [data])
 
   const table = useReactTable({
     data: users,
-    columns: propColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    manualPagination: true, 
-    manualFiltering: true, 
-    pageCount: totalPages,
+    manualSorting: true,
+    manualFiltering: true,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: (value) => {
-      setGlobalFilter(value)
-      setCurrentPage(1) 
-    },
     state: {
       sorting,
-      columnFilters,
-      globalFilter,
-      pagination: {
-        pageIndex: currentPage - 1,
-        pageSize,
-      },
     },
   })
-  if (isAuthLoading) return <div>Loading...</div>;
-  if (!user) return <div>Please login</div>;
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage()
+      }
+    })
+
+    const ref = bottomRef.current
+    if (ref) observer.observe(ref)
+    return () => ref && observer.unobserve(ref)
+  }, [bottomRef.current, hasNextPage, isFetchingNextPage, fetchNextPage])
+
   const handleRowClick = (user: User) => {
     navigate(`/users/${user.id}`)
   }
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-  }
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize)
-    setCurrentPage(1) 
-  }
-
-  const startIndex = (currentPage - 1) * pageSize + 1
-  const endIndex = Math.min(currentPage * pageSize, totalUsers)
-
-  if (error) {
-    return (
-      <div className="w-full p-8 bg-gray-100">
-        <Alert variant="destructive">
-          <AlertDescription>
-            Failed to load users: {error.message}
-          </AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
+  if (isAuthLoading) return <div>Loading...</div>
+  if (!user) return <div>Please login</div>
 
   return (
     <div className="w-full min-h-screen p-8 bg-gray-100">
-      <div className="">
-        <div className="flex flex-col w-full py-4 gap-4">
-          <h2 className="font-bold text-xl">Hello {user?.name} 👋,</h2>
-          
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Hello {user.name} 👋</h2>
+        <Button variant="outline" onClick={() => setFilterModalOpen(true)}>
+          <FilterIcon className="w-4 h-4 mr-2" />
+          Filters
+        </Button>
+      </div>
+
+      <div className="bg-white rounded-2xl p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-900">All Users</h1>
+            {isFetching && (
+              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+            )}
+          </div>
+          {Object.keys(filters).length > 0 && (
+  <div className="flex flex-wrap gap-2 mt-2 mb-4">
+    {Object.entries(filters).map(([key, value]) => (
+      <div key={key} className="bg-gray-100 text-sm px-3 py-1 rounded-full text-gray-700 border">
+        {key.replace(/_/g, ' ')}: {String(value)}
+      </div>
+    ))}
+    <Button variant="ghost" size="sm" onClick={() => setFilters({})}>
+      Clear All Filters
+    </Button>
+  </div>
+)}
+
         </div>
-        
-        <div className="bg-white p-6 mt-8 rounded-2xl">
-          {/* Table Header with Title and Search */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900">All Users</h1>
-              {isFetching && (
-                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+
+        {error ? (
+          <div className="text-center text-red-600">⚠️ Failed to load users.</div>
+        ) : isLoading ? (
+          <div className="flex items-center justify-center h-64 flex-col gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+            <p className="text-gray-500">Loading users...</p>
+          </div>
+        ) : (
+          <>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map(headerGroup => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map(header => (
+                      <TableHead
+                        key={header.id}
+                        onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                        className={`py-4 px-6 text-left font-semibold ${
+                          header.column.getCanSort() ? 'cursor-pointer hover:underline' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{
+                            asc: ' 🔼',
+                            desc: ' 🔽',
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {users.length > 0 ? (
+                  table.getRowModel().rows.map(row => (
+                    <TableRow
+                      key={row.id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleRowClick(row.original)}
+                    >
+                      {row.getVisibleCells().map(cell => (
+                        <TableCell key={cell.id} className="py-4 px-6">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="text-center py-12 text-gray-500">
+                      <div className="text-xl mb-2">👥</div>
+                      <p>No users match your filter.</p>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+
+            <div ref={bottomRef} className="h-16 mt-6 flex justify-center items-center">
+              {isFetchingNextPage && (
+                <span className="flex items-center gap-2 text-sm text-gray-500">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading more users...
+                </span>
+              )}
+              {!hasNextPage && users.length > 0 && (
+                <span className="text-gray-400 text-sm">
+                  Showing all {users.length} user{users.length !== 1 && 's'}
+                </span>
               )}
             </div>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                <Input
-                  placeholder="Search users..."
-                  value={globalFilter ?? ""}
-                  onChange={(event) => setGlobalFilter(String(event.target.value))}
-                  className="pl-10 w-80"
-                />
-              </div>
-         
-          </div>
-
-          {/* Loading state */}
-          {isLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="flex flex-col items-center space-y-4">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                <p className="text-gray-500">Loading users...</p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id} className="border-b border-gray-200 hover:bg-gray-100">
-                      {headerGroup.headers.map((header) => {
-                        return (
-                          <TableHead 
-                            key={header.id} 
-                            className="font-semibold text-gray-900 py-4 px-6 text-left"
-                          >
-                            {header.isPlaceholder ? null : (
-                              <div
-                                {...{
-                                  className: header.column.getCanSort()
-                                    ? 'cursor-pointer select-none flex items-center gap-1'
-                                    : '',
-                                  onClick: header.column.getToggleSortingHandler(),
-                                }}
-                              >
-                                {flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )}
-                                {{
-                                  asc: ' 🔼',
-                                  desc: ' 🔽',
-                                }[header.column.getIsSorted() as string] ?? null}
-                              </div>
-                            )}
-                          </TableHead>
-                        )
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {users?.length ? (
-                    users.map((user: User, index: number) => (
-                      <TableRow
-                        key={user.id}
-                        className={`
-                          border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 cursor-pointer
-                          ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}
-                        `}
-                        onClick={() => handleRowClick(user)}
-                      >
-                        {table.getHeaderGroups()[0].headers.map((header) => (
-                          <TableCell 
-                            key={header.id}
-                            className="py-4 px-6"
-                          >
-                            {flexRender(
-                              header.column.columnDef.cell, 
-                              { ...header.getContext(), row: { original: user } }
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell 
-                        colSpan={propColumns.length} 
-                        className="h-32 text-center text-gray-500 bg-gray-50"
-                      >
-                        <div className="flex flex-col items-center justify-center space-y-2">
-                          <div className="text-4xl">📋</div>
-                          <div className="text-lg font-medium">No users found</div>
-                          <div className="text-sm">
-                            {globalFilter ? 'Try adjusting your search criteria' : 'No users available'}
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-
-              {/* Pagination Controls */}
-              <div className="flex items-center justify-between space-x-2 py-4">
-                <div className="text-sm text-gray-600">
-                  Showing {totalUsers > 0 ? startIndex : 0} to {endIndex} of {totalUsers} users
-                </div>
-                <select
-                value={pageSize}
-                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                className="border border-gray-300 rounded-md px-3 py-1 text-sm"
-              >
-                <option value={10}>10 per page</option>
-                <option value={25}>25 per page</option>
-                <option value={50}>50 per page</option>
-                <option value={100}>100 per page</option>
-              </select>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(1)}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronsLeft size={16} />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft size={16} />
-                  </Button>
-                  
-                  <span className="flex items-center gap-1 text-sm">
-                    Page
-                    <strong>
-                      {currentPage} of {totalPages || 1}
-                    </strong>
-                  </span>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage >= totalPages}
-                  >
-                    <ChevronRight size={16} />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(totalPages)}
-                    disabled={currentPage >= totalPages}
-                  >
-                    <ChevronsRight size={16} />
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+          </>
+        )}
       </div>
+
+      <FilterModal
+        isOpen={filterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        currentFilters={filters}
+        onApplyFilters={setFilters}
+      />
     </div>
   )
 }
