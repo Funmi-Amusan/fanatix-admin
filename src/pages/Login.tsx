@@ -67,7 +67,7 @@ const Login = () => {
       onClick={() => setShowPassword(prev => !prev)}
       className="text-sm text-blue-600 hover:underline focus:outline-none"
     >
-      {showPassword ? 'Hide' : 'Show'}
+      {showPassword ? 'Hide' : 'Show'} password
     </button>
   </div>
   <Input

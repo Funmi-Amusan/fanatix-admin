@@ -1,4 +1,4 @@
-import { Calendar, User, Users } from "lucide-react";
+import { Calendar, LogOut, User, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useLogout } from "@/hooks/useAuthMutations";
 
 const mainItems = [
   {
@@ -30,6 +31,7 @@ const profileItem = {
 };
 
 export function AppSidebar() {
+  const logout = useLogout();
   return (
     <Sidebar>
       <SidebarContent className="flex flex-col justify-between h-full">
@@ -54,6 +56,13 @@ export function AppSidebar() {
         </div>
 
         <div className="mb-4">
+        <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={()=> logout()}>
+               <LogOut /> Logout
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>

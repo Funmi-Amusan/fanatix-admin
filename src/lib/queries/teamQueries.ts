@@ -1,4 +1,5 @@
-import { teamEndpoints } from '@/api/endpoints';
+
+import { teamEndpoints } from '@/api/endpoints/teamEndpoints';
 import type { FetchTeamsParams, TeamsResponse } from '@/api/types/teams';
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 

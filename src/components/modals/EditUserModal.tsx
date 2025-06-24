@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useUpdateUserMutation } from "@/hooks/useUserMutations";
+import { useTeamsQuery } from "@/lib/queries/teamQueries";
 import type { Team } from "@/api/types/teams";
 
 interface EditUserModalProps {
@@ -26,10 +27,16 @@ interface EditUserModalProps {
   };
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  teams: Team[]| undefined;
 }
 
-const EditUserModal = ({ id, user, isOpen, onOpenChange, teams }: EditUserModalProps) => {
+const EditUserModal = ({ id, user, isOpen, onOpenChange }: EditUserModalProps) => {
+
+  const { data: allTeams = [], isLoading: isTeamsLoading } = useTeamsQuery();
+
+  const teams = Array.isArray(allTeams)
+    ? allTeams
+    : allTeams?.data?.teams;
+  
   const [formData, setFormData] = useState({
     username: user.username,
     email: user.email,
@@ -105,6 +112,8 @@ const EditUserModal = ({ id, user, isOpen, onOpenChange, teams }: EditUserModalP
               placeholder="12" 
             />
           </div>
+          {!isTeamsLoading ? 
+          (
           <div className="grid gap-2">
             <Label htmlFor="team">Team</Label>
             <Select 
@@ -115,7 +124,7 @@ const EditUserModal = ({ id, user, isOpen, onOpenChange, teams }: EditUserModalP
                 <SelectValue placeholder="Select team" />
               </SelectTrigger>
               <SelectContent>
-                {teams?.map((team) => (
+                {teams?.map((team: Team) => (
                   <SelectItem key={team.ID} value={team.ID}>
                     {team.name}
                   </SelectItem>
@@ -123,6 +132,11 @@ const EditUserModal = ({ id, user, isOpen, onOpenChange, teams }: EditUserModalP
               </SelectContent>
             </Select>
           </div>
+          ): (
+            <p>Loading Teams</p>
+          )
+
+          }
         </div>
         <DialogFooter>
           <DialogClose asChild>
@@ -138,5 +152,4 @@ const EditUserModal = ({ id, user, isOpen, onOpenChange, teams }: EditUserModalP
     </Dialog>
   );
 }
-
 export default EditUserModal;

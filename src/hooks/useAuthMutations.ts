@@ -1,5 +1,5 @@
-import { authEndpoints } from '@/api/endpoints';
-import { setAuthTokens, setUserData } from '@/lib/storage';
+import { authEndpoints } from '@/api/endpoints/authEndpoints';
+import { clearAuthData, setAuthTokens, setUserData } from '@/lib/storage';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,13 +29,11 @@ export const useLoginMutation = () => {
 };
 
 export const useChangePasswordMutation = () => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   return useMutation({
     mutationFn: authEndpoints.changePassword,
-    onSuccess: (data) => {
-      queryClient.setQueryData(['user'], data.data.admin);
+    onSuccess: () => {
       navigate('/login');
     },
     onError: (error) => {
@@ -44,18 +42,17 @@ export const useChangePasswordMutation = () => {
   });
 };
 
-// export const useLogoutMutation = () => {
-//   const queryClient = useQueryClient();
-//   const navigate = useNavigate();
+export const useLogout = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
-//   return useMutation({
-//     mutationFn: authEndpoints.logout,
-//     onSuccess: () => {
-//       queryClient.clear();
-      
-//       clearAuthTokens();
-      
-//       navigate('/login');
-//     }
-//   });
-// };
+  const logout = () => {
+    queryClient.clear();  
+    clearAuthData(); 
+    sessionStorage.clear();     
+    localStorage.removeItem('userData'); 
+    navigate('/login');
+  };
+
+  return logout;
+};

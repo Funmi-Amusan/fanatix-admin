@@ -27,7 +27,6 @@ import CoinTransactionTable from "@/components/Users/CoinTransactionTable"
 import { useUserQuery } from "@/lib/queries/userQueries"
 import EditUserModal from "@/components/modals/EditUserModal"
 import DeleteUserModal from "@/components/modals/DeleteUserModal"
-import { useTeamsQuery } from "@/lib/queries/teamQueries"
 import DeactivateInviteCodeModal from "@/components/modals/DeactivateInviteCodeModal"
 import ActivateInviteCodeModal from "@/components/modals/ActivateInviteCodeModal"
 import ChangeInviteCodeModal from "@/components/modals/ChangeInviteCodeModal"
@@ -45,20 +44,20 @@ const UserDetails = () => {
 
   //i can use team?.color to design the page of the user details
  
-  const { 
-     data: userDetails, 
-    //  isLoading, 
-    //  error,
-    //  isFetching 
-   } = useUserQuery(id || '')
+  const { data: userDetails, isLoading: isUserLoading } = useUserQuery(id || '');
+  
 
-   const { 
-    data: allTeams, 
-   //  isLoading, 
-   //  error,
-   //  isFetching 
-  } = useTeamsQuery()
-  const theTeams = allTeams?.data?.teams
+  if (isUserLoading ) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <div className="text-3xl animate-pulse mb-2">⏳</div>
+          <p className="text-lg font-medium">Loading user details...</p>
+        </div>
+      </div>
+    );
+  }
+  
 
   if (!userDetails?.data.fan) {
     return (
@@ -247,7 +246,6 @@ const UserDetails = () => {
           user={editUserDetails} 
           isOpen={isEditModalOpen} 
           onOpenChange={setIsEditModalOpen}
-          teams={theTeams}
         />
         <DeleteUserModal   
         id={id}

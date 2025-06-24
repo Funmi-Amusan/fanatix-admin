@@ -1,4 +1,5 @@
-import { userEndpoints } from '@/api/endpoints';
+
+import { userEndpoints } from '@/api/endpoints/userEndpoints';
 import type { FetchUsersParams, UserResponse, UsersResponse } from '@/api/types/users';
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 

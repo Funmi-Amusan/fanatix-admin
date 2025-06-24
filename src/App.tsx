@@ -20,9 +20,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
  <Routes>
-  <Route path="/" element={<RedirectRoot />} />
+  {/* <Route path="/" element={<RedirectRoot />} /> */}
   <Route path="/login" element={<Login />} />
-  <Route element={<ProtectedRoute />}>
+  {/* <Route element={<ProtectedRoute />}> */}
     <Route element={<SidebarLayout />}>
       <Route path="/users" element={<UsersList />} />
       <Route path="/users/:id" element={<UserDetails />} />
@@ -31,7 +31,7 @@ function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/change-password" element={<ChangePassword />} />
     </Route>
-  </Route>
+  {/* </Route> */}
   <Route path="*" element={<NotFound />} />
 </Routes>
   </QueryClientProvider>

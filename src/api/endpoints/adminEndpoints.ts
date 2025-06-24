@@ -13,9 +13,11 @@ export const adminEndpoints = {
     return httpClient.get<AdminsResponse>(`/admin?${queryString}`, token);
   },
   addAdmin: async (credentials: addAdminRequest): Promise<addAdminResponse> => {
-    return httpClient.post<addAdminResponse>('/admin/add', credentials);
+    const { token } = getAuthTokens();
+    return httpClient.post<addAdminResponse>('/admin/add', credentials, token);
   },
   deleteAdmin: async (adminId: string): Promise<addAdminResponse> => {
-    return httpClient.delete<addAdminResponse>(`/admin/add${adminId}`, );
+    const { token } = getAuthTokens();
+    return httpClient.delete<addAdminResponse>(`/admin/add${adminId}`, token);
   },
 };

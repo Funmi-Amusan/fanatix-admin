@@ -1,4 +1,5 @@
-import type { LoggedInUser } from "@/api/types/auth";
+import type { AdminUser } from "@/api/types/admins";
+
 
 export const setAuthTokens = (token: string, refreshToken: string) => {
     sessionStorage.setItem('token', token);
@@ -12,7 +13,7 @@ export const setAuthTokens = (token: string, refreshToken: string) => {
     };
   };
   
-  export const setUserData = (userData: LoggedInUser) => {
+  export const setUserData = (userData: AdminUser) => {
     localStorage.setItem('userData', JSON.stringify(userData));
   };
   

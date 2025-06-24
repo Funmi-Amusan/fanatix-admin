@@ -1,6 +1,6 @@
-import { walletEndpoints } from '@/api/endpoints';
-import type { FetchTransactionsParams, TransactionResponse, TransactionsResponse } from '@/api/types/transactions';
-import type { PlansResponse } from '@/api/types/wallet';
+
+import { walletEndpoints } from '@/api/endpoints/walletEndpoints';
+import type { FetchTransactionsParams, PlansResponse, TransactionResponse, TransactionsResponse } from '@/api/types/wallet';
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 
 export const useTransactionsQuery = (

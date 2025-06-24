@@ -1,6 +1,6 @@
+import { adminEndpoints } from '@/api/endpoints/adminEndpoints';
+import type { addAdminRequest, addAdminResponse } from '@/api/types/admins';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminEndpoints } from '@/api/endpoints';
-import type { addAdminRequest, addAdminResponse } from '@/api/types/auth';
 
 export const useAddAdminMutation = () => {
   const queryClient = useQueryClient();

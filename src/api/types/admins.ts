@@ -2,7 +2,7 @@ export interface addAdminRequest {
     name: string;
     email: string;
     password: string;
-    roles: 'viewer'| 'sales'| 'hr'| 'super'| 'coach'
+    roles: ('viewer'| 'sales'| 'hr'| 'super'| 'coach')[]
   }
 
   export interface addAdminResponse {
