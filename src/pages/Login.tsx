@@ -10,6 +10,8 @@ import { useLoginMutation } from '@/hooks/useAuthMutations';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const loginMutation = useLoginMutation();
 
@@ -58,23 +60,31 @@ const Login = () => {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loginMutation.isPending}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSubmit(e);
-                      }
-                    }}
-                  />
-                </div>
+  <div className="flex items-center justify-between">
+    <Label htmlFor="password">Password</Label>
+    <button
+      type="button"
+      onClick={() => setShowPassword(prev => !prev)}
+      className="text-sm text-blue-600 hover:underline focus:outline-none"
+    >
+      {showPassword ? 'Hide' : 'Show'}
+    </button>
+  </div>
+  <Input
+    id="password"
+    type={showPassword ? 'text' : 'password'}
+    placeholder="password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    disabled={loginMutation.isPending}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter') {
+        handleSubmit(e);
+      }
+    }}
+  />
+</div>
+
                 <Button 
                   onClick={handleSubmit}
                   className="w-full"

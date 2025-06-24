@@ -57,8 +57,6 @@ import {
           page: pageParam,
           limit: pageSize,
         });
-  
-        // Defensive fallback for null users array
         return {
           ...response,
           data: {
