@@ -109,7 +109,7 @@ export default function UsersList({ columns = defaultColumns }: UsersListProps) 
     const ref = bottomRef.current
     if (ref) observer.observe(ref)
     return () => ref && observer.unobserve(ref)
-  }, [bottomRef.current, hasNextPage, isFetchingNextPage, fetchNextPage])
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const handleRowClick = (user: User) => {
     navigate(`/users/${user.id}`)
