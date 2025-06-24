@@ -1,3 +1,4 @@
+import type { Team } from "./teams";
 
 export interface User {
   id: string;
@@ -21,7 +22,12 @@ export interface User {
   wallet: Wallet;
 }
 
-
+export interface updateUser {
+  teamId: string;
+  fanSince: number;
+  squadNumber: number;
+  username: string;
+}
 
 export interface UsersResponse {
     data: {
@@ -46,14 +52,6 @@ export interface FetchUsersParams {
     search?: string;
     role?: string;
 }
-
-interface Team {
-    ID: string;
-    name: string;
-    imageURL: string;
-    externalID: string;
-    color: string;
-  }
   
   interface Wallet {
     id: string;

@@ -1,4 +1,5 @@
 import type { LoginRequest } from "./types/auth";
+import type { updateUser } from "./types/users";
 
 const API_BASE_URL = 'https://fanatix.usetend.com/api/v1';
 
@@ -47,7 +48,7 @@ export const httpClient = {
     return response.json();
   },
 
-  put: async <T>(endpoint: string, data: LoginRequest, token?: string| null): Promise<T> => {
+  put: async <T>(endpoint: string, data: LoginRequest | updateUser, token?: string| null): Promise<T> => {
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
       };
@@ -56,10 +57,53 @@ export const httpClient = {
       }
   
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'POST',
+        method: 'PUT',
         headers,
         body: JSON.stringify(data),
       });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Request failed');
+    }
+
+    return response.json();
+  },
+
+  patch: async <T>(endpoint: string, token?: string| null): Promise<T> => {
+    const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+  
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'PATCH',
+        headers,
+      });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Request failed');
+    }
+
+    return response.json();
+  },
+
+  delete: async <T>(endpoint: string, token?: string| null): Promise<T> => {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers,
+    });
 
     if (!response.ok) {
       const errorData = await response.json();

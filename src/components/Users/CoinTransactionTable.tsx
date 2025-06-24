@@ -13,44 +13,59 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
-import { mockUserDetails } from '@/lib/data'
 import { coinTransactionColumns } from './coinTransactionColumns'
+import { useTransactionsQuery } from '@/lib/queries/transactionQueries'
 
-
-interface CoinTransactionTableProps {
-  userId?: string;
-}
-
-const CoinTransactionTable = ({ userId }: CoinTransactionTableProps) => {
+const CoinTransactionTable = ({id}: {id: string}) => {
+  console.log('id', id)
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState("")
+  const { data: allTransactions, isLoading, isError, error } = useTransactionsQuery(id, { page: 1, limit: 10 });
 
-  const data = userId 
-    ? mockUserDetails.coinTransactions || [] 
-    : mockUserDetails.coinTransactions || [];
+  const transactions = allTransactions?.data?.transactions
 
-  const table = useReactTable({
-    data,
-    columns: coinTransactionColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    state: {
-      sorting,
-      columnFilters,
-      globalFilter,
-    },
-    initialState: {
-      pagination: {
-        pageSize: 10,
+  const data = transactions
+    const table = useReactTable({
+      data,
+      columns: coinTransactionColumns,
+      getCoreRowModel: getCoreRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      onSortingChange: setSorting,
+      onColumnFiltersChange: setColumnFilters,
+      onGlobalFilterChange: setGlobalFilter,
+      state: {
+        sorting,
+        columnFilters,
+        globalFilter,
       },
-    },
-  })
+      initialState: {
+        pagination: {
+          pageSize: 10,
+        },
+      },
+    })
+
+  if (isLoading) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        <div className="animate-pulse text-lg">Loading transactions...</div>
+      </div>
+    );
+  }
+  
+  if (isError) {
+    return (
+      <div className="p-6 text-center text-red-600">
+        <p className="text-lg font-semibold">Failed to load transactions</p>
+        <p className="text-sm">{(error as Error)?.message ?? "Something went wrong."}</p>
+      </div>
+    );
+  }
+  
+
 
   return (
     <div className="bg-white p-6 rounded-2xl">
@@ -199,5 +214,4 @@ const CoinTransactionTable = ({ userId }: CoinTransactionTableProps) => {
     </div>
   )
 }
-
 export default CoinTransactionTable

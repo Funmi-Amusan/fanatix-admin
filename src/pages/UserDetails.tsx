@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom"
+import { useState } from "react"
 import { 
   ArrowLeft, 
   Edit, 
@@ -24,10 +25,23 @@ import { Label } from "@/components/ui/label"
 import InvitedUsersTable from "@/components/Users/InvitedUsersTable"
 import CoinTransactionTable from "@/components/Users/CoinTransactionTable"
 import { useUserQuery } from "@/lib/queries/userQueries"
+import EditUserModal from "@/components/modals/EditUserModal"
+import DeleteUserModal from "@/components/modals/DeleteUserModal"
+import { useTeamsQuery } from "@/lib/queries/teamQueries"
+import DeactivateInviteCodeModal from "@/components/modals/DeactivateInviteCodeModal"
+import ActivateInviteCodeModal from "@/components/modals/ActivateInviteCodeModal copy"
+import ChangeInviteCodeModal from "@/components/modals/ChangeInviteCodeModal"
+import AddCoinsModal from "@/components/modals/addCoinsModal"
 
 const UserDetails = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeactivateCodeDialogOpen, setIsDeactivateCodeDialogOpen] = useState(false)
+  const [isActivateCodeDialogOpen, setIsActivateCodeDialogOpen] = useState(false)
+  const [isChangeCodeDialogOpen, setIsChangeCodeDialogOpen] = useState(false)
+  const [isAddCoinsDialogOpen, setIsAddCoinsDialogOpen] = useState(false)
 
   //i can use team?.color to design the page of the user details
  
@@ -37,6 +51,16 @@ const UserDetails = () => {
     //  error,
     //  isFetching 
    } = useUserQuery(id || '')
+
+  
+  
+   const { 
+    data: allTeams, 
+   //  isLoading, 
+   //  error,
+   //  isFetching 
+  } = useTeamsQuery()
+  const theTeams = allTeams?.data?.teams
 
   if (!userDetails?.data.fan) {
     return (
@@ -54,7 +78,7 @@ const UserDetails = () => {
     )
   }
 
-  const {name, email, emailVerified, fanSince, squadNumber, username, inviteCode, createdAt, updatedAt, inviteDeactivated, teams, wallet} = userDetails.data.fan
+  const { name, email, emailVerified, fanSince, teamId, squadNumber, username, inviteCode, createdAt, updatedAt, inviteDeactivated, teams, wallet} = userDetails.data.fan
 
   const getVerificationBadge = (verified: boolean, label: string) => (
     <div className={` flex items-center w-fit ${verified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"} `}>
@@ -64,9 +88,37 @@ const UserDetails = () => {
   )
 
   const showEditModal = () => {
+    setIsEditModalOpen(true)
   }
 
-  console.log('team', inviteDeactivated)
+  const showDeleteDialog = () => {
+    setIsDeleteDialogOpen(true)
+  }
+
+  const showDeactivateCodeDialog = () => {
+    setIsDeactivateCodeDialogOpen(true)
+  }
+
+  const showActivateCodeDialog = () => {
+    setIsActivateCodeDialogOpen(true)
+  }
+
+  const showChangeCodeDialog = () => {
+    setIsChangeCodeDialogOpen(true)
+  }
+
+  const handleShowAddCoinsModal = () => {
+    setIsAddCoinsDialogOpen(true)
+  }
+
+  const editUserDetails = {
+    username, 
+    email, 
+    fanSince, 
+    squadNumber,
+    teamId
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-8 w-full ">
 
@@ -93,20 +145,21 @@ const UserDetails = () => {
             Edit User Details
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Verify User
+          <DropdownMenuItem onClick={()=> handleShowAddCoinsModal()}>
+            Add Coins
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem> Deactivate Invite Code</DropdownMenuItem>
-        <DropdownMenuItem>Generate New Invite Code</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=> showDeactivateCodeDialog()}> Deactivate Invite Code</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=> showActivateCodeDialog()}>Activate Invite Code</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=> showChangeCodeDialog()}>Change Invite Code</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={()=> showDeleteDialog()}>
         Delete User
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-        </div>
+        </div> 
         <div className=" flex flex-col gap-8">
           <div className="">
             <Card>
@@ -186,10 +239,37 @@ const UserDetails = () => {
   <TabsContent value="invitedUsers">
     <InvitedUsersTable />
   </TabsContent>
-  <TabsContent value="coinTransactions"><CoinTransactionTable /></TabsContent>
+  <TabsContent value="coinTransactions"><CoinTransactionTable id={id}/></TabsContent>
 </Tabs>
-      
         </div>
+        <EditUserModal 
+            id={id}
+          user={editUserDetails} 
+          isOpen={isEditModalOpen} 
+          onOpenChange={setIsEditModalOpen}
+          teams={theTeams}
+        />
+        <DeleteUserModal   
+        id={id}
+        isOpen={isDeleteDialogOpen} 
+          onOpenChange={setIsDeleteDialogOpen} />
+            <DeactivateInviteCodeModal   
+        id={id}
+        isOpen={isDeactivateCodeDialogOpen} 
+          onOpenChange={setIsDeactivateCodeDialogOpen} />
+            <ActivateInviteCodeModal   
+        id={id}
+        isOpen={isActivateCodeDialogOpen} 
+          onOpenChange={setIsActivateCodeDialogOpen} />
+                <ChangeInviteCodeModal   
+        id={id}
+        isOpen={isChangeCodeDialogOpen} 
+          onOpenChange={setIsChangeCodeDialogOpen} />
+
+<AddCoinsModal   
+        id={id}
+        isOpen={isAddCoinsDialogOpen} 
+          onOpenChange={setIsAddCoinsDialogOpen} />
     </div>
   )
 }

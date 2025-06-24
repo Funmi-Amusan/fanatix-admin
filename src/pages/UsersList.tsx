@@ -26,6 +26,7 @@ import { columns } from "@/components/Users/userListTableColumns"
 import type { User } from "@/api/types/users"
 import { useUsersQuery } from "@/lib/queries/userQueries"
 import { useUser } from "@/hooks/useUser"
+import { getAuthTokens } from '@/lib/storage';
 
 export default function UsersList({
   columns: propColumns = columns,
@@ -33,6 +34,8 @@ export default function UsersList({
   columns?: ColumnDef<User, unknown>[]
 }) {
   const { data: user, isLoading: isAuthLoading } = useUser();
+  const { token } = getAuthTokens();
+  console.log(" const { token } = getAuthTokens();", token)
 
   const navigate = useNavigate()
 
@@ -113,67 +116,14 @@ export default function UsersList({
   }
 
   return (
-    <div className="w-full p-8 bg-gray-100">
+    <div className="w-full min-h-screen p-8 bg-gray-100">
       <div className="">
         <div className="flex flex-col w-full py-4 gap-4">
           <h2 className="font-bold text-xl">Hello {user?.name} 👋,</h2>
-          <div className="bg-white shadow-sm p-4 grid rounded-2xl grid-cols-3">
-            <div className="flex gap-2 items-center">
-              <div className="bg-emerald-200 text-emerald-600 rounded-full p-4">
-                <Users size={32}/>
-              </div>
-              <div className="flex flex-col">
-                <h4 className="text-sm text-black/40">
-                  Total Users
-                </h4>
-                <p className="font-bold text-lg">
-                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : totalUsers}
-                </p>
-                <p className="flex whitespace-nowrap text-xs items-center"> 
-                  <span className="text-emerald-600 inline-flex pr-1">
-                    <ArrowUp size={14} /> 16% 
-                  </span> this month
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2 items-center">
-              <div className="bg-blue-200 text-blue-600 rounded-full p-4">
-                <Users size={32}/>
-              </div>
-              <div className="flex flex-col">
-                <h4 className="text-sm text-black/40">
-                  Active Users
-                </h4>
-                {/* <p className="font-bold text-lg">
-                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : users.filter((u: User) => 'isActive' in u && u.isActive).length}                </p>
-                 */}
-                <p className="flex whitespace-nowrap text-xs items-center"> 
-                  <span className="text-blue-600 inline-flex pr-1">
-                    <ArrowUp size={14} /> 8% 
-                  </span> this month
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2 items-center">
-              <div className="bg-purple-200 text-purple-600 rounded-full p-4">
-                <Users size={32}/>
-              </div>
-              <div className="flex flex-col">
-                <h4 className="text-sm text-black/40">
-                  New Users
-                </h4>
-                <p className="font-bold text-lg">234</p>
-                <p className="flex whitespace-nowrap text-xs items-center"> 
-                  <span className="text-purple-600 inline-flex pr-1">
-                    <ArrowUp size={14} /> 12% 
-                  </span> this month
-                </p>
-              </div>
-            </div>
-          </div>
+          
         </div>
         
-        <div className="bg-white p-6 rounded-2xl">
+        <div className="bg-white p-6 mt-8 rounded-2xl">
           {/* Table Header with Title and Search */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
@@ -182,20 +132,6 @@ export default function UsersList({
                 <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
               )}
             </div>
-            <div className="flex items-center gap-4">
-              {/* Page size selector */}
-              <select
-                value={pageSize}
-                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                className="border border-gray-300 rounded-md px-3 py-1 text-sm"
-              >
-                <option value={10}>10 per page</option>
-                <option value={25}>25 per page</option>
-                <option value={50}>50 per page</option>
-                <option value={100}>100 per page</option>
-              </select>
-              
-              {/* Search input */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                 <Input
@@ -205,7 +141,7 @@ export default function UsersList({
                   className="pl-10 w-80"
                 />
               </div>
-            </div>
+         
           </div>
 
           {/* Loading state */}
@@ -301,7 +237,16 @@ export default function UsersList({
                 <div className="text-sm text-gray-600">
                   Showing {totalUsers > 0 ? startIndex : 0} to {endIndex} of {totalUsers} users
                 </div>
-                
+                <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+              >
+                <option value={10}>10 per page</option>
+                <option value={25}>25 per page</option>
+                <option value={50}>50 per page</option>
+                <option value={100}>100 per page</option>
+              </select>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
