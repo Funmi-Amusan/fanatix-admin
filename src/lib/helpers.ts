@@ -8,6 +8,20 @@ export const formatDate = (date: Date) => {
     }).format(date)
   }
 
+  export const formatClearDate = (
+    date: Date | string | number,
+    options?: Intl.DateTimeFormatOptions
+  ): string => {
+    const d = new Date(date);
+    const defaultOptions: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'short', 
+      day: '2-digit', 
+    };
+  
+    return d.toLocaleDateString('en-US', { ...defaultOptions, ...options });
+  };
+
 export const formatToAPIDate = (dateStr: string | undefined) => {
     if (!dateStr) return undefined;
     const iso = new Date(dateStr).toISOString();
