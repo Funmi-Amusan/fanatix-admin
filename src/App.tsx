@@ -6,7 +6,7 @@ const UsersList = lazy(() => import('./pages/UsersList'));
 const UserDetails = lazy(() => import('./pages/UserDetails'));
 const FixtureDetails = lazy(() => import('./pages/FixtureDetails'));
 const ChangePassword = lazy(() => import('./pages/ChangePassword'));
-const Profile = lazy(() => import('./pages/Profile'));
+const Admins = lazy(() => import('./pages/Admins'));
 const Login = lazy(() => import('./pages/Login'));
 const NotFound = lazy(() => import('./components/404'));
 
@@ -30,7 +30,7 @@ function App() {
       <Route path="/users/:id" element={<UserDetails />} />
       <Route path="/fixtures" element={<FixturesList />} />
       <Route path="/fixtures/:id" element={<FixtureDetails />} />
-      <Route path="/profile" element={<Profile />} />
+      <Route path="/admins" element={<Admins />} />
       <Route path="/change-password" element={<ChangePassword />} />
     </Route>
   {/* </Route> */}

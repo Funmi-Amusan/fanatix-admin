@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { 
   ArrowLeft, 
-  Users2, 
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -75,8 +74,7 @@ const FixtureDetails = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Users2 className="h-5 w-5" />
-                  {ID}
+                Fixture ID: {ID}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-8">
@@ -100,7 +98,14 @@ const FixtureDetails = () => {
                   </div>
                   <div>
                     <Label>Match Start Time</Label>
-                    <p className="mt-1 font-mono text-gray-900">{start_time}</p>
+                    <p className="mt-1 text-gray-900">  {start_time ? new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: true, 
+  }).format(new Date(start_time)) : 'N/A'}</p>
                   </div>
                   <div>
                     <Label>Match State</Label>

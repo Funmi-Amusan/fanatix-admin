@@ -13,15 +13,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-// Define the primary color for easy reuse and modification
 const primaryColor = '#0E6654';
 const primaryColorText = 'text-[#0E6654]';
 const primaryColorRing = 'focus:ring-[#0E6654]';
 const primaryColorBg = 'bg-[#0E6654]';
 const primaryColorBgHover = 'hover:bg-[#0c5a4a]';
 
-const Profile = () => {
-  const { data: loggedInUser, isLoading: isAuthLoading } = useUser();
+const Admins = () => {
+  const { isLoading: isAuthLoading } = useUser();
   const allRoles = ['viewer', 'sales', 'hr', 'super', 'coach'] as const;
   const { data, isLoading, isError, error } = useAdminsQuery({ page: 1, limit: 100 });
   const addAdmin = useAddAdminMutation();
@@ -67,10 +66,8 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Main Content Grid */}
         <div className="flex flex-col gap-4">
           
-          {/* Add Admin Section (Left Column) */}
           <div className="lg:col-span-1">
   <Card className="border-gray-200/80 shadow-sm bg-white">
     <CardHeader className="border-b border-gray-100">
@@ -344,4 +341,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Admins;
