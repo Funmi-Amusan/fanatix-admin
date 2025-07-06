@@ -43,7 +43,6 @@ export function AppSidebar() {
   if (!loggedInUser) {
     navigate('/login')
   }
-  console.log(loggedInUser?.roles)
 
   return (
       <Sidebar>
