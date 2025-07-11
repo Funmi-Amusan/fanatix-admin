@@ -10,7 +10,7 @@ export const userEndpoints = {
           .filter(([, value]) => value !== undefined && value !== null)
           .map(([key, value]) => [key, String(value)])
       ).toString();      
-      return httpClient.get<UsersResponse>(`/admin/user?${queryString}`, token);
+      return httpClient.get<UsersResponse>(`/admin/user/?${queryString}`, token);
     },
   
    

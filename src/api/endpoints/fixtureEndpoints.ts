@@ -11,7 +11,7 @@ export const fixtureEndpoints = {
         ...(params.search && { search: params.search }),
       }).toString();
       
-      return httpClient.get<FixturesResponse>(`/admin/fixture?${queryString}`, token);
+      return httpClient.get<FixturesResponse>(`/admin/fixture/?${queryString}`, token);
     },
   
     fetchFixtureById: async (fixtureId: string): Promise<FixtureResponse> => {
@@ -25,6 +25,6 @@ export const fixtureEndpoints = {
         page: (params.page || 1).toString(),
         limit: (params.limit || 10).toString()
       }).toString();
-      return httpClient.get<FixtureChatRoomUsersResponse>(`/admin/chat/${fixtureId}/user?${queryString}`, token);
+      return httpClient.get<FixtureChatRoomUsersResponse>(`/admin/chat/${fixtureId}/user/?${queryString}`, token);
     },
   };

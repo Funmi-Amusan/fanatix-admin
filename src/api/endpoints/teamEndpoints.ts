@@ -10,6 +10,6 @@ import type { FetchTeamsParams, TeamsResponse } from "../types/teams";
         limit: (params.limit || 10).toString(),
         ...(params.name && { search: params.name }),
       }).toString();
-      return httpClient.get<TeamsResponse>(`/team?${queryString}`, token);
+      return httpClient.get<TeamsResponse>(`/team/?${queryString}`, token);
     }
   };
