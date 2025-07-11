@@ -9,7 +9,7 @@ import type { FetchTransactionsParams, TransactionsResponse, TransactionResponse
         page: (params.page || 1).toString(),
         limit: (params.limit || 10).toString(),
       }).toString();
-      return httpClient.get<TransactionsResponse>(`/admin/wallet/${userId}/?${queryString}`, token);
+      return httpClient.get<TransactionsResponse>(`/admin/wallet/${userId}?${queryString}`, token);
     },
 
     fetchATransaction: async (userId: string, transactionId: string): Promise<TransactionResponse> => {
