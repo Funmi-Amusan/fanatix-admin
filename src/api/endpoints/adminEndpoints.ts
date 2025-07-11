@@ -10,7 +10,7 @@ export const adminEndpoints = {
         .filter(([, value]) => value !== undefined && value !== null)
         .map(([key, value]) => [key, String(value)])
     ).toString();      
-    return httpClient.get<AdminsResponse>(`/admin?${queryString}`, token);
+    return httpClient.get<AdminsResponse>(`/admin/?${queryString}`, token);
   },
   addAdmin: async (credentials: addAdminRequest): Promise<addAdminResponse> => {
     const { token } = getAuthTokens();
